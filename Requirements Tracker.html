@@ -1,0 +1,2094 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Requirements Tracker</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300..700&display=swap">
+<style>
+/* Layout: one working column in the house monochrome system — light-weight project header, sticky segmented type tabs + pill toolbar, then epic groups as soft-fill bars separated by whitespace, rows with compact right-aligned properties and a quick-add line per group. The detail pane docks to the right on wide screens (list stays live) and overlays on narrow ones. Ink fills carry emphasis; the single blue accent marks AI drafting only. */
+:root {
+  --canvas: #ffffff;
+  --canvas-soft: #f3f3f3;
+  --field: #f0f0f0;
+  --hairline-soft: #f0f0f0;
+  --hairline: #e0e0e0;
+  --ink: #141414;
+  --ink-soft: #262626;
+  --muted: #707070;
+  --faint: #adadad;
+  --primary: #141414;
+  --on-primary: #ffffff;
+  --accent: #0066ff;
+  --accent-hover: #0052cc;
+  --accent-subtle: #e6f0ff;
+  --accent-text: #0052cc;
+  --on-accent: #ffffff;
+  --scrim: rgba(20, 20, 20, .32);
+  --lift: 0 1px 2px rgba(20, 20, 20, .10), 0 0 0 .5px rgba(20, 20, 20, .04);
+  --float: 0 16px 48px rgba(20, 20, 20, .14), 0 2px 8px rgba(20, 20, 20, .06);
+  --font: "Hanken Grotesk", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --w-head: 650; --w-strong: 600; --w-text: 450; --w-light: 300;
+  --r-sm: 16px; --r-md: 24px; --r-full: 9999px;
+  --pane-w: 460px;
+  /* MoSCoW colour tags — the one place the tracker uses hue, so priority reads at a glance */
+  --must-bg: #fde8e6; --must-fg: #b42318; --must-dot: #e5484d;
+  --should-bg: #fdf1dc; --should-fg: #8a5100; --should-dot: #f5a524;
+  --could-bg: #e2f5ea; --could-fg: #18693f; --could-dot: #30a46c;
+  --wont-bg: #f0f0f0; --wont-fg: #707070; --wont-dot: #adadad;
+  /* Requirement type colours — violet, teal and magenta, kept clear of the MoSCoW reds, ambers and greens */
+  --user-bg: #eeeaff; --user-fg: #5135c0; --user-dot: #7253f0;
+  --business-bg: #dbf3f5; --business-fg: #07616c; --business-dot: #12a1b3;
+  --technical-bg: #fbe6f3; --technical-fg: #a01f6c; --technical-dot: #d6409f;
+  --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23888888' stroke-width='1.8'%3E%3Cpath d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --canvas: #141414; --canvas-soft: #1f1f1f; --field: #252525; --hairline-soft: #222222; --hairline: #353535;
+    --ink: #f3f3f3; --ink-soft: #e0e0e0; --muted: #a3a3a3; --faint: #6b6b6b;
+    --primary: #f3f3f3; --on-primary: #141414; --accent: #3d8bff; --on-accent: #0b1220;
+    --accent-hover: #66a3ff; --accent-subtle: #0b1f40; --accent-text: #66a3ff;
+    --scrim: rgba(0, 0, 0, .55); --lift: 0 1px 2px rgba(0, 0, 0, .6); --float: 0 16px 48px rgba(0, 0, 0, .6), 0 2px 8px rgba(0, 0, 0, .4);
+    --must-bg: #3d1a18; --must-fg: #ffa39b; --should-bg: #38280c; --should-fg: #f7c46c; --could-bg: #11301f; --could-fg: #84d9a8; --wont-bg: #262626; --wont-fg: #a3a3a3; --wont-dot: #6b6b6b;
+    --user-bg: #261f45; --user-fg: #c4b5ff; --business-bg: #0c2d31; --business-fg: #7fd8e3; --technical-bg: #3a1530; --technical-fg: #f59bd2;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --canvas: #141414; --canvas-soft: #1f1f1f; --field: #252525; --hairline-soft: #222222; --hairline: #353535;
+  --ink: #f3f3f3; --ink-soft: #e0e0e0; --muted: #a3a3a3; --faint: #6b6b6b;
+  --primary: #f3f3f3; --on-primary: #141414; --accent: #3d8bff; --on-accent: #0b1220;
+  --accent-hover: #66a3ff; --accent-subtle: #0b1f40; --accent-text: #66a3ff;
+  --scrim: rgba(0, 0, 0, .55); --lift: 0 1px 2px rgba(0, 0, 0, .6); --float: 0 16px 48px rgba(0, 0, 0, .6), 0 2px 8px rgba(0, 0, 0, .4);
+  --must-bg: #3d1a18; --must-fg: #ffa39b; --should-bg: #38280c; --should-fg: #f7c46c; --could-bg: #11301f; --could-fg: #84d9a8; --wont-bg: #262626; --wont-fg: #a3a3a3; --wont-dot: #6b6b6b;
+    --user-bg: #261f45; --user-fg: #c4b5ff; --business-bg: #0c2d31; --business-fg: #7fd8e3; --technical-bg: #3a1530; --technical-fg: #f59bd2;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--canvas); color: var(--ink); font-family: var(--font); font-size: 14px; font-weight: var(--w-text); line-height: 1.43; -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--canvas); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+b, strong { font-weight: var(--w-strong); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+svg { flex: none; }
+.tdot:not(.tab .tdot) { display: none; }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+@media (min-width: 1100px) {
+  body.pane-open .main { margin-right: var(--pane-w); }
+  body.pane-open .wrap { padding-right: 28px; }
+}
+
+/* Header */
+.top { padding-block: 40px 24px; display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.eyebrow { font-size: 14px; color: var(--muted); margin: 0 0 8px; }
+h1 { font-size: 32px; line-height: 1.13; font-weight: var(--w-head); margin: 0; text-wrap: balance; }
+.top-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+/* Pills */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 16px;
+  border-radius: var(--r-full); border: 1px solid var(--hairline); background: var(--canvas);
+  font-weight: var(--w-strong); font-size: 14px; white-space: nowrap;
+}
+.btn:hover { background: var(--canvas-soft); }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn.primary, .btn.accent { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary:hover:not(:disabled), .btn.accent:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+.btn.primary .ai-mark, .btn.accent .ai-mark { background: var(--on-accent); color: var(--accent); }
+.btn.ghost { border-color: transparent; background: var(--canvas-soft); }
+.btn.ghost:hover { background: var(--field); }
+.btn.tertiary { border-color: transparent; background: transparent; }
+.btn.tertiary:hover { background: var(--canvas-soft); }
+.btn.danger.solid { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.btn svg { width: 16px; height: 16px; }
+.icon-btn { width: 36px; height: 36px; display: inline-grid; place-items: center; border: 0; background: none; border-radius: var(--r-full); color: var(--muted); flex: none; }
+.icon-btn:hover { background: var(--canvas-soft); color: var(--ink); }
+.icon-btn svg { width: 18px; height: 18px; }
+.icon-btn:disabled { opacity: .3; cursor: default; background: none; }
+.ai-mark { display: inline-flex; align-items: center; height: 18px; padding: 0 7px; border-radius: var(--r-full); background: var(--accent); color: var(--on-accent); font-size: 11px; font-weight: var(--w-strong); line-height: 1; }
+.linkbtn { border: 0; background: none; padding: 0; color: var(--accent-text); font-weight: var(--w-strong); text-decoration: underline; text-decoration-color: var(--hairline); text-underline-offset: 3px; }
+.linkbtn:hover { text-decoration-color: var(--accent-text); }
+
+.banner { display: flex; align-items: center; justify-content: space-between; gap: 12px 16px; flex-wrap: wrap; padding: 14px 16px 14px 24px; margin-bottom: 24px; border-radius: var(--r-md); background: var(--canvas-soft); font-size: 14px; }
+
+/* Sticky tabs + toolbar */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 6; background: var(--canvas); padding-top: 8px; }
+.tabs { display: inline-flex; gap: 2px; padding: 4px; border-radius: var(--r-full); background: var(--canvas-soft); overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px; border: 0; border-radius: var(--r-full); background: none; color: var(--muted); font-weight: var(--w-strong); font-size: 14px; white-space: nowrap; }
+.tab:hover { color: var(--ink); }
+.tab .n { font-size: 12px; font-weight: var(--w-text); color: var(--muted); }
+.tab[aria-selected="true"] { background: var(--canvas); color: var(--ink); box-shadow: var(--lift); }
+
+.toolbar { position: relative; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-block: 12px 16px; }
+.search { position: relative; flex: 1 1 220px; min-width: 0; max-width: 300px; }
+.search svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--muted); pointer-events: none; }
+.search input { width: 100%; height: 40px; padding: 0 16px 0 38px; border-radius: var(--r-full); border: 0; background: var(--field); }
+.search input::placeholder, .input::placeholder, .textarea::placeholder { color: var(--faint); }
+.search input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: var(--r-full); border: 1px solid var(--hairline); background: var(--canvas); font-size: 14px; font-weight: var(--w-strong); }
+.chip:hover { background: var(--canvas-soft); }
+.chip .cn { font-size: 12px; font-weight: var(--w-text); color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.chip[aria-pressed="true"] .cn { color: var(--on-primary); opacity: .7; }
+.chip .cdot { width: 8px; height: 8px; border-radius: 50%; background: var(--pdot); }
+.chip[data-pri][aria-pressed="true"] { background: var(--pbg); color: var(--pfg); border-color: var(--pdot); }
+.chip[data-pri][aria-pressed="true"] .cn { color: var(--pfg); }
+.dd-btn svg:last-child { width: 14px; height: 14px; }
+.dd-btn.on { background: var(--accent-subtle); border-color: var(--accent); color: var(--accent-text); }
+
+/* Popover parts */
+.pop-h { font-size: 16px; font-weight: var(--w-strong); }
+.pop-foot { display: flex; align-items: center; gap: 8px; padding-top: 4px; }
+.pop-foot .btn { height: 36px; padding: 0 14px; font-size: 13px; }
+#utPop { right: auto; width: 280px; }
+.optlist { display: flex; flex-direction: column; gap: 2px; max-height: 280px; overflow-y: auto; margin: 0 -8px; }
+.opt { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--r-sm); cursor: pointer; font-size: 14px; }
+.opt:hover { background: var(--canvas-soft); }
+.opt input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
+.opt .cn { margin-left: auto; color: var(--muted); font-size: 12px; }
+.top-actions { position: relative; }
+#epicPop { top: calc(100% + 8px); width: 340px; }
+.epic-pop-form { display: flex; flex-direction: column; gap: 12px; }
+
+/* Who's adding requirements */
+.namecard { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; padding: 16px 16px 16px 24px; border-radius: var(--r-md); background: var(--canvas-soft); margin-bottom: 12px; }
+.namecard > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.namecard > div span { color: var(--muted); }
+.namecard form { display: flex; gap: 8px; flex-wrap: wrap; }
+.namecard .input { background: var(--canvas); width: 240px; max-width: 100%; height: 40px; border-radius: var(--r-full); }
+
+/* Epics in the list */
+.add-epic { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 52px; border-radius: var(--r-sm); border: 1.5px dashed var(--hairline); background: none; color: var(--muted); font-weight: var(--w-strong); font-size: 14px; }
+.add-epic:hover { border-color: var(--ink); color: var(--ink); background: var(--canvas-soft); }
+.add-epic svg { width: 16px; height: 16px; }
+.epic-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px; border-radius: var(--r-sm); background: var(--canvas-soft); }
+.epic-form .input { flex: 1 1 220px; background: var(--canvas); height: 40px; border-radius: var(--r-full); }
+.epic-form .errmsg { flex-basis: 100%; padding-left: 12px; }
+.ghead .rename { display: flex; flex: 1 1 auto; gap: 8px; align-items: center; padding: 6px 0 6px 8px; flex-wrap: wrap; }
+.ghead .rename .input { flex: 1 1 200px; height: 36px; background: var(--canvas); border-radius: var(--r-full); }
+.ghead .rename .btn { height: 36px; }
+.gact { opacity: .55; }
+.ghead:hover .gact, .gact:focus-visible { opacity: 1; }
+.select { height: 40px; padding: 0 36px 0 16px; border-radius: var(--r-full); border: 0; background: var(--field) var(--chev) no-repeat right 12px center / 16px; appearance: none; -webkit-appearance: none; max-width: 100%; font-weight: var(--w-text); }
+.select:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.spacer { flex: 1 1 0; }
+.display-btn[aria-expanded="true"] { background: var(--canvas-soft); }
+.display-btn .dotmark { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+/* Display popover */
+.pop { position: absolute; right: 0; top: calc(100% - 6px); z-index: 8; width: 320px; max-width: 100%; background: var(--canvas); border: 1px solid var(--hairline-soft); border-radius: var(--r-md); box-shadow: var(--float); padding: 16px 16px 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+.pop-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pop-row label, .pop-row .lbl { font-size: 14px; }
+.pop .select { height: 36px; min-width: 150px; }
+.pop hr { border: 0; border-top: 1px solid var(--hairline-soft); margin: 0; }
+.pop-sub { font-size: 12px; font-weight: var(--w-strong); color: var(--muted); }
+.switch { position: relative; width: 36px; height: 20px; flex: none; }
+.switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; z-index: 1; }
+.switch span { position: absolute; inset: 0; border-radius: var(--r-full); background: var(--hairline); transition: background .15s; }
+.switch span::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--canvas); transition: transform .15s; box-shadow: var(--lift); }
+.switch input:checked + span { background: var(--accent); }
+.switch input:checked + span::after { transform: translateX(16px); }
+.switch input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.propchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.propchip { height: 32px; padding: 0 12px; border-radius: var(--r-full); border: 1px solid var(--hairline); background: var(--canvas); font-size: 13px; font-weight: var(--w-strong); color: var(--muted); }
+.propchip[aria-pressed="true"] { background: var(--accent-subtle); border-color: var(--accent); color: var(--accent-text); }
+.pop-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.pop-actions .btn { height: 34px; font-size: 13px; padding: 0 14px; }
+
+/* List: groups separated by whitespace, soft-fill bars as headers */
+.list { display: flex; flex-direction: column; gap: 20px; --cols: 72px minmax(0, 1fr) minmax(0, 240px) 26px 20px 72px; }
+/* Each group is an outlined section on the white canvas. Grey fills are kept for inputs and secondary tags, so the epic reads as structure, not as a control. */
+.group { border: 1px solid var(--hairline); border-radius: var(--r-md); background: var(--canvas); padding: 6px; }
+.group[data-gkey="all"] { border: 0; padding: 0; }
+.group[data-gkey$=":none"] { border-style: dashed; }
+.ghead { display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 4px; min-height: 64px; }
+.gtoggle { display: flex; align-items: center; gap: 10px; border: 0; background: none; padding: 6px 10px; border-radius: var(--r-sm); min-width: 0; text-align: left; flex: 1 1 auto; }
+.gtoggle:hover .gname { text-decoration: underline; text-decoration-color: var(--hairline); text-underline-offset: 4px; }
+.gtitles { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.gline { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.chev { width: 18px; height: 18px; color: var(--muted); transition: transform .15s ease; }
+.gtoggle[aria-expanded="false"] .chev { transform: rotate(-90deg); }
+.gname { font-size: 20px; line-height: 1.3; font-weight: var(--w-head); min-width: 0; overflow-wrap: anywhere; }
+.gname.muted { color: var(--muted); }
+.gcount { flex: none; font-size: 12px; font-weight: var(--w-strong); color: var(--muted); padding: 1px 8px; border-radius: var(--r-full); box-shadow: inset 0 0 0 1px var(--hairline); }
+.gdesc { color: var(--muted); font-size: 13px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gadd { margin-left: auto; }
+.gbody { border-top: 1px solid var(--hairline-soft); padding-top: 4px; margin: 0 -6px; padding-inline: 6px; }
+.group[data-gkey="all"] > .gbody { border-top: 0; margin: 0; padding-inline: 0; }
+
+/* Rows and the column header share one grid so every pill lines up down the list.
+   Wide lists use the JS-built columns; narrower lists (pane open, small screens) fall back to the templates in the container queries below. */
+.list { container: list / inline-size; }
+.colhead, .row { display: grid; grid-template-columns: var(--cols); grid-template-areas: var(--areas); align-items: center; column-gap: 16px; }
+.colhead { padding: 0 23px 0 51px; margin-bottom: -12px; font-size: 12px; font-weight: var(--w-strong); color: var(--muted); }
+.row {
+  width: 100%; text-align: left; border: 0; background: none; cursor: pointer; user-select: none; -webkit-user-select: none;
+  padding: 12px 16px 12px 44px; border-radius: var(--r-sm); min-height: 56px; position: relative; row-gap: 6px;
+}
+.row > .rid { grid-area: id; } .row > .rmain { grid-area: main; } .row > .c-tags { grid-area: tags; }
+.row > .c-by { grid-area: by; } .row > .c-st { grid-area: st; } .row > .c-pri { grid-area: pri; }
+.row + .row::after { content: ""; position: absolute; left: 44px; right: 16px; top: 0; border-top: 1px solid var(--hairline-soft); }
+.row:hover + .row::after, .row.is-sel + .row::after, .row:hover::after, .row.is-sel::after { border-color: transparent; }
+.row:hover { background: var(--canvas-soft); }
+.row.is-sel { background: var(--accent-subtle); }
+.row.is-sel::before { content: ""; position: absolute; left: 6px; top: 50%; width: 4px; height: 20px; margin-top: -10px; border-radius: var(--r-full); background: var(--accent); }
+.row:focus-visible { outline-offset: -2px; }
+.grip { position: absolute; left: 14px; top: 50%; width: 18px; height: 18px; margin-top: -9px; color: var(--faint); opacity: 0; cursor: grab; }
+.grip svg { width: 18px; height: 18px; }
+.row:hover .grip, .row:focus-visible .grip { opacity: 1; }
+@media (hover: none) { .grip { display: none; } }
+.row.dragging { opacity: .35; }
+.row.drop-before { box-shadow: inset 0 3px 0 -1px var(--accent); }
+.row.drop-after { box-shadow: inset 0 -3px 0 -1px var(--accent); }
+.group.drop-into { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+body.is-dragging .row:hover { background: none; }
+
+/* Requirement type colour tags */
+.t-user { --tbg: var(--user-bg); --tfg: var(--user-fg); --tdot: var(--user-dot); }
+.t-business { --tbg: var(--business-bg); --tfg: var(--business-fg); --tdot: var(--business-dot); }
+.t-technical { --tbg: var(--technical-bg); --tfg: var(--technical-fg); --tdot: var(--technical-dot); }
+.rid { justify-self: start; display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: var(--r-full); background: var(--tbg, var(--canvas-soft)); color: var(--tfg, var(--muted)); font-size: 12px; font-weight: var(--w-strong); white-space: nowrap; letter-spacing: 0; }
+.ttag { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 12px 0 10px; border-radius: var(--r-full); background: var(--tbg); color: var(--tfg); font-size: 13px; font-weight: var(--w-strong); }
+/* Requirement types are marked with an icon (person / briefcase / code), never a dot — dots belong to priority */
+.ticon { width: 14px; height: 14px; flex: none; color: var(--tfg); }
+.tab .ticon { width: 16px; height: 16px; }
+.rid { gap: 5px; padding-left: 7px; }
+.rmain { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.rtitle { font-size: 15px; font-weight: var(--w-text); overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.row.is-sel .rtitle { font-weight: var(--w-strong); }
+.rdesc { color: var(--muted); font-size: 13px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+.row.is-wont .rtitle, .row.is-archived .rtitle { color: var(--muted); }
+/* Tags hug their labels: each pill sizes to its text, wraps to a new line rather than squeezing, and only truncates past the column width */
+.c-tags { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-start; align-content: center; min-width: 0; }
+.tag { display: inline-flex; align-items: center; flex: 0 0 auto; max-width: 100%; height: 24px; padding: 0 10px; border-radius: var(--r-full); background: var(--canvas-soft); color: var(--ink); font-size: 12px; font-weight: var(--w-strong); line-height: 1; white-space: nowrap; }
+.tag .tx { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.row:hover .tag, .row.is-sel .tag { background: var(--canvas); }
+.tag.more { color: var(--muted); }
+.tag.type { background: transparent; box-shadow: inset 0 0 0 1px var(--hairline); }
+.tag.arch { background: transparent; box-shadow: inset 0 0 0 1px var(--faint); color: var(--muted); }
+.c-st { display: inline-flex; align-items: center; gap: 8px; min-width: 0; font-size: 13px; color: var(--muted); white-space: nowrap; }
+.c-st svg { width: 18px; height: 18px; }
+.ghead .c-st .stl { display: none; }
+
+/* MoSCoW colour tags */
+.p-must { --pbg: var(--must-bg); --pfg: var(--must-fg); --pdot: var(--must-dot); }
+.p-should { --pbg: var(--should-bg); --pfg: var(--should-fg); --pdot: var(--should-dot); }
+.p-could { --pbg: var(--could-bg); --pfg: var(--could-fg); --pdot: var(--could-dot); }
+.p-wont { --pbg: var(--wont-bg); --pfg: var(--wont-fg); --pdot: var(--wont-dot); }
+.pri { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px 0 8px; border-radius: var(--r-full); background: var(--pbg); color: var(--pfg); font-size: 12px; font-weight: var(--w-strong); line-height: 1; white-space: nowrap; flex: none; }
+.pri::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--pdot); flex: none; }
+.c-pri { display: flex; justify-content: flex-start; }
+
+/* Narrower lists: keep fixed positions, move secondary pills under the title */
+@container list (max-width: 860px) {
+  .colhead { display: none; }
+  .row { grid-template-columns: 92px minmax(0, 1fr) 26px 20px 80px; grid-template-areas: "id main by st pri" ". tags tags tags tags"; }
+  .c-st .stl { display: none; }
+}
+@container list (max-width: 540px) {
+  .row { grid-template-columns: auto minmax(0, 1fr) auto auto; grid-template-areas: "id . st pri" "main main main main" "tags tags tags by"; padding: 12px 14px; column-gap: 10px; }
+  .row + .row::after { left: 14px; right: 14px; }
+  .c-by { justify-self: end; }
+  .qa { padding-left: 14px !important; }
+}
+
+/* Who added it */
+.av { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: var(--r-full); background: var(--canvas-soft); color: var(--ink); font-size: 10.5px; font-weight: var(--w-strong); line-height: 1; flex: none; box-shadow: inset 0 0 0 1px var(--hairline); }
+.av.unknown { color: var(--muted); }
+.row:hover .av, .row.is-sel .av { background: var(--canvas); }
+.c-by { display: inline-grid; place-items: center; }
+.byline { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.byline b { color: var(--ink); }
+
+.qa { display: flex; align-items: center; gap: 12px; padding: 0 16px 0 44px; margin-top: 2px; border-radius: var(--r-sm); min-height: 48px; color: var(--muted); }
+.qa svg { width: 16px; height: 16px; }
+.qa input { flex: 1 1 auto; min-width: 0; border: 0; background: none; height: 46px; padding: 0; outline: none; font-size: 15px; }
+.qa input::placeholder { color: var(--muted); }
+.qa:hover { background: var(--canvas-soft); }
+.qa:focus-within { background: var(--field); color: var(--ink); box-shadow: inset 0 0 0 2px var(--accent); }
+.qa .hint { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.qa:not(:focus-within) .hint { display: none; }
+
+.empty { padding: 48px 24px; text-align: center; color: var(--muted); background: var(--canvas-soft); border-radius: var(--r-md); }
+.empty h2 { font-size: 24px; line-height: 1.25; font-weight: var(--w-head); color: var(--ink); margin: 0 0 8px; }
+.empty p { margin: 0 auto 20px; max-width: 46ch; font-size: 16px; }
+.teach { padding: 48px; background: var(--canvas-soft); border-radius: var(--r-md); }
+.teach h2 { font-size: 32px; line-height: 1.13; font-weight: var(--w-head); margin: 0 0 12px; text-wrap: balance; }
+.teach > p { color: var(--muted); margin: 0 0 32px; max-width: 58ch; font-size: 18px; font-weight: var(--w-light); line-height: 1.38; }
+.teach-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 32px; }
+.teach-card { border-radius: var(--r-sm); padding: 20px; display: flex; flex-direction: column; gap: 8px; background: var(--canvas); }
+.teach-card h3 { margin: 0; font-size: 16px; font-weight: var(--w-strong); }
+.teach-card p { margin: 0; color: var(--muted); font-size: 14px; }
+.teach-card .eg { font-size: 13px; color: var(--ink-soft); padding-top: 12px; margin-top: auto; }
+.teach-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Inverse footer band */
+.foot { margin: 64px 0 0; padding: 28px 32px calc(32px + env(safe-area-inset-bottom, 0px)); background: var(--primary); color: var(--on-primary); border-radius: var(--r-md) var(--r-md) 0 0; font-size: 14px; display: flex; flex-wrap: wrap; gap: 4px 24px; }
+.foot:empty { display: none; }
+.foot span:last-child { opacity: .6; }
+
+/* Detail pane */
+.pane {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 21; width: min(var(--pane-w), 100%);
+  background: var(--canvas); border-left: 1px solid var(--hairline); display: flex; flex-direction: column;
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); padding-right: env(safe-area-inset-right, 0px);
+}
+@media (max-width: 1099px) { .pane { animation: slide .18s ease-out; } }
+@media (min-width: 1100px) { .pane-scrim { display: none; } .pane { z-index: 7; } }
+@keyframes slide { from { transform: translateX(24px); opacity: .6; } }
+@media (prefers-reduced-motion: reduce) { .pane, .drawer, .modal { animation: none !important; } .chev, .switch span, .switch span::after { transition: none; } }
+/* The whole pane is one scroll container (wheel works anywhere over it); header and footer stay pinned */
+.pane { overflow-y: auto; overscroll-behavior: contain; }
+.phead { position: sticky; top: 0; z-index: 2; background: var(--canvas); display: flex; align-items: center; gap: 6px; padding: 12px 12px 12px 24px; min-height: 60px; }
+.phead .rid { font-size: 13px; height: 28px; padding: 0 12px; }
+.pnav { display: inline-flex; align-items: center; gap: 0; margin-left: 8px; background: var(--canvas-soft); border-radius: var(--r-full); padding: 2px; }
+.pnav .icon-btn { width: 32px; height: 32px; }
+.pnav .icon-btn:hover { background: var(--canvas); }
+.pnav .pos { font-size: 12px; color: var(--muted); min-width: 48px; text-align: center; }
+.pbody { flex: 1 0 auto; padding: 8px 24px 32px; display: flex; flex-direction: column; gap: 28px; }
+.pfoot { position: sticky; bottom: 0; z-index: 2; background: var(--canvas); display: flex; align-items: center; gap: 8px; padding: 14px 20px 16px 24px; border-top: 1px solid var(--hairline); flex-wrap: wrap; }
+.dirty { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: var(--w-strong); }
+.dirty::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--should-dot); }
+.leave { font-size: 14px; font-weight: var(--w-strong); }
+.title-input { width: 100%; border: 0; border-radius: var(--r-sm); background: none; font-size: 24px; font-weight: var(--w-head); line-height: 1.25; padding: 6px 10px; margin: -6px -10px; resize: none; overflow: hidden; }
+.title-input::placeholder { color: var(--faint); }
+.title-input:hover { background: var(--canvas-soft); }
+.title-input:focus { background: var(--field); outline: 2px solid var(--accent); outline-offset: 0; }
+.title-input.err { outline: 2px solid var(--must-dot); background: var(--field); }
+.props { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px 12px; align-items: center; }
+.props > .lbl { font-size: 14px; color: var(--muted); }
+.props .select { height: 40px; width: 100%; }
+.mos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; padding: 4px; border-radius: var(--r-full); background: var(--canvas-soft); }
+.mos button { height: 32px; border-radius: var(--r-full); border: 0; background: none; font-size: 13px; font-weight: var(--w-strong); color: var(--muted); white-space: nowrap; padding: 0 4px; }
+.mos.types { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.mos button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.mos:not(.types) button::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--pdot); flex: none; }
+.mos button:hover { color: var(--ink); }
+.mos button[aria-pressed="true"] { background: var(--pbg, var(--tbg)); color: var(--pfg, var(--tfg)); box-shadow: var(--lift); }
+.utchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.utchip { height: 32px; padding: 0 12px; border-radius: var(--r-full); border: 1px solid var(--hairline); background: var(--canvas); font-size: 13px; font-weight: var(--w-strong); color: var(--muted); }
+.utchip:hover { color: var(--ink); }
+.utchip[aria-pressed="true"] { background: var(--accent-subtle); border-color: var(--accent); color: var(--accent-text); }
+.field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.field > label, .field > .lbl { font-size: 14px; font-weight: var(--w-strong); }
+.help { font-size: 13px; color: var(--muted); font-weight: var(--w-text); }
+.input, .textarea { width: 100%; border: 0; border-radius: var(--r-sm); background: var(--field); padding: 12px 16px; }
+.input { height: 44px; }
+.input:focus, .textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.textarea { min-height: 150px; resize: vertical; line-height: 1.5; }
+.errmsg { color: var(--must-fg); font-size: 13px; font-weight: var(--w-strong); }
+.errmsg::before { content: "! "; }
+.sect { display: flex; flex-direction: column; gap: 12px; }
+.sect-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sect-h h3 { margin: 0; font-size: 16px; font-weight: var(--w-strong); }
+.source { font-size: 14px; color: var(--muted); }
+.quote { margin: 0; padding: 12px 16px; color: var(--ink-soft); font-size: 14px; background: var(--canvas-soft); border-radius: var(--r-sm); }
+.signed { display: flex; gap: 12px; align-items: flex-start; padding: 16px; border-radius: var(--r-sm); background: var(--canvas-soft); }
+.signed svg { width: 20px; height: 20px; color: var(--ink); margin-top: 1px; }
+.signed p { margin: 0; }
+.signed .sm { font-size: 13px; color: var(--muted); }
+.unsigned { font-size: 14px; color: var(--muted); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 12px 12px 16px; border-radius: var(--r-sm); background: var(--canvas-soft); }
+.soform { display: grid; grid-template-columns: 1fr 160px; gap: 12px; padding: 16px; border-radius: var(--r-sm); background: var(--canvas-soft); }
+.soform .input { background: var(--canvas); }
+.soform .full { grid-column: 1 / -1; }
+.soform .acts { grid-column: 1 / -1; display: flex; gap: 8px; justify-content: flex-end; }
+.notice { font-size: 14px; padding: 12px 16px; border-radius: var(--r-sm); background: var(--canvas-soft); }
+.log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.log li { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; font-size: 13px; padding: 6px 0; position: relative; }
+.log li::before { content: ""; position: absolute; left: 4px; top: 18px; bottom: -8px; width: 1px; background: var(--hairline); }
+.log li:last-child::before { display: none; }
+.log .ld { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--c, var(--hairline)); background: var(--canvas); position: relative; top: 1px; }
+.log .lt { color: var(--muted); min-width: 0; overflow-wrap: anywhere; }
+.log .lt b { color: var(--ink); }
+.log time { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.confirm { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; font-weight: var(--w-strong); }
+
+/* Overlays */
+.scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 20; }
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 22; width: min(480px, 100%); background: var(--canvas); border-left: 1px solid var(--hairline);
+  display: flex; flex-direction: column; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); padding-right: env(safe-area-inset-right, 0px);
+  animation: slide .18s ease-out;
+}
+.dhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 16px 12px 24px; }
+.dhead h2 { margin: 0; font-size: 24px; line-height: 1.25; font-weight: var(--w-head); }
+.dbody { flex: 1 1 auto; overflow-y: auto; padding: 8px 24px 32px; display: flex; flex-direction: column; gap: 32px; }
+.ssect { display: flex; flex-direction: column; gap: 12px; }
+.ssect h3 { font-size: 16px; font-weight: var(--w-strong); margin: 0; }
+.ssect p { margin: 0; color: var(--muted); font-size: 14px; }
+.slist { display: flex; flex-direction: column; gap: 6px; }
+.sitem { display: flex; gap: 4px; align-items: center; }
+.sitem .input { flex: 1 1 auto; min-width: 0; }
+.sitem .cnt { font-size: 12px; color: var(--muted); width: 28px; text-align: right; flex: none; }
+.addline { display: flex; gap: 8px; }
+.addline .input { flex: 1 1 auto; min-width: 0; }
+.row-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.modal-wrap { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: var(--scrim); padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.modal { width: min(800px, 100%); max-height: 100%; background: var(--canvas); border-radius: var(--r-md); box-shadow: var(--float); display: flex; flex-direction: column; overflow: hidden; animation: rise .18s ease-out; }
+@keyframes rise { from { transform: translateY(10px); opacity: .6; } }
+.mhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 24px 20px 12px 28px; }
+.mhead h2 { margin: 0; font-size: 24px; line-height: 1.25; font-weight: var(--w-head); }
+.mbody { overflow-y: auto; padding: 8px 28px 28px; display: flex; flex-direction: column; gap: 20px; min-height: 0; }
+.mfoot { display: flex; align-items: center; gap: 8px; padding: 16px 20px 20px 28px; border-top: 1px solid var(--hairline-soft); flex-wrap: wrap; }
+.mfoot .note { font-size: 13px; color: var(--muted); max-width: 44ch; }
+.segtabs { display: inline-flex; padding: 4px; gap: 2px; border-radius: var(--r-full); background: var(--canvas-soft); align-self: flex-start; max-width: 100%; flex-wrap: wrap; }
+.segtabs button { border: 0; background: none; height: 36px; padding: 0 16px; border-radius: var(--r-full); font-weight: var(--w-strong); font-size: 14px; color: var(--muted); display: inline-flex; align-items: center; gap: 8px; }
+.segtabs button[aria-selected="true"] { background: var(--canvas); color: var(--ink); box-shadow: var(--lift); }
+.drop { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; min-height: 200px; padding: 48px 24px; border: 1.5px dashed var(--hairline); border-radius: var(--r-md); background: var(--canvas-soft); cursor: pointer; }
+.drop:hover, .drop.over { border-color: var(--accent); background: var(--accent-subtle); }
+.drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.drop svg { width: 28px; height: 28px; color: var(--accent); }
+.drop strong { font-size: 16px; }
+.drop span { color: var(--muted); font-size: 14px; }
+.drop:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.drop.hero { min-height: 230px; gap: 10px; border-color: color-mix(in srgb, var(--accent) 45%, var(--hairline)); background: color-mix(in srgb, var(--accent-subtle) 55%, var(--canvas)); }
+.drop.hero svg { width: 34px; height: 34px; color: var(--accent); }
+.drop.hero strong { font-size: 20px; font-weight: var(--w-head); }
+.drop.hero .ai-mark { height: 22px; padding: 0 10px; font-size: 12px; margin-top: 6px; }
+.drop.hero.is-wait { cursor: default; color: var(--muted); }
+.alt { display: flex; flex-direction: column; gap: 10px; padding-top: 8px; border-top: 1px solid var(--hairline-soft); }
+.alt-label { font-size: 13px; color: var(--muted); padding-top: 12px; }
+.alt-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.alt-card { display: flex; align-items: flex-start; gap: 12px; text-align: left; padding: 16px; border-radius: var(--r-sm); border: 1px solid var(--hairline); background: var(--canvas); }
+.alt-card:hover { border-color: var(--ink); }
+.alt-card svg { width: 20px; height: 20px; flex: none; margin-top: 1px; color: var(--ink); }
+.alt-card > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.alt-card b { font-size: 15px; }
+.alt-card > span > span { font-size: 13px; color: var(--muted); }
+.filechip { display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 20px; border-radius: var(--r-full); background: var(--canvas-soft); }
+.filechip .fn { font-weight: var(--w-strong); min-width: 0; overflow-wrap: anywhere; }
+.filechip .fs { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.how { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; counter-reset: how; }
+.how li { font-size: 14px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; counter-increment: how; }
+.how li::before { content: counter(how); display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: var(--r-full); background: var(--primary); color: var(--on-primary); font-size: 12px; font-weight: var(--w-strong); margin-bottom: 6px; }
+.how li b { color: var(--ink); font-size: 15px; }
+.working { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 48px 12px; text-align: center; }
+.working .big { font-size: 20px; font-weight: var(--w-strong); line-height: 1.3; }
+.working .sub { color: var(--muted); font-size: 14px; max-width: 46ch; }
+.spinner { width: 28px; height: 28px; border-radius: 50%; border: 3px solid var(--hairline); border-top-color: var(--accent); animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2.4s; } }
+.count-big { font-size: 56px; line-height: 1; font-weight: var(--w-head); color: var(--accent); }
+.rsum { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; font-size: 14px; color: var(--muted); padding: 12px 16px; border-radius: var(--r-full); background: var(--canvas-soft); }
+.rsum b { color: var(--ink); }
+.rsum label { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); font-weight: var(--w-strong); margin-right: auto; }
+.rsum input, .cand input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; }
+.cgroup h3 { font-size: 16px; font-weight: var(--w-strong); margin: 0 0 8px; }
+.cands { display: flex; flex-direction: column; }
+.cand { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 12px; padding: 14px 4px; border-top: 1px solid var(--hairline-soft); }
+.cand:first-child { border-top: 0; }
+.cand.off .ctitle, .cand.off .cmeta { color: var(--faint); }
+.cand input[type="checkbox"] { margin-top: 10px; }
+.cmain { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.ctitle { width: 100%; border: 0; border-radius: var(--r-sm); background: none; padding: 6px 10px; margin-left: -10px; font-weight: var(--w-strong); font-size: 15px; }
+.ctitle:hover { background: var(--canvas-soft); }
+.ctitle:focus { background: var(--field); outline: 2px solid var(--accent); outline-offset: 0; }
+.cmeta { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; font-size: 13px; color: var(--muted); }
+.cmeta .select { height: 32px; font-size: 13px; padding: 0 32px 0 12px; background-position: right 8px center; }
+.newtag { display: inline-flex; align-items: center; height: 20px; font-size: 11px; font-weight: var(--w-strong); padding: 0 8px; border-radius: var(--r-full); background: var(--canvas-soft); color: var(--ink); border: 1px solid var(--hairline); }
+.duptag { font-size: 13px; color: var(--ink); font-weight: var(--w-strong); }
+.cand details summary { cursor: pointer; font-size: 13px; color: var(--accent-text); font-weight: var(--w-strong); width: fit-content; }
+.cand details[open] summary { margin-bottom: 8px; }
+.cand details p { margin: 0 0 8px; font-size: 14px; white-space: pre-wrap; color: var(--ink-soft); }
+.warn, .err-box { font-size: 14px; padding: 14px 20px; border-radius: var(--r-sm); background: var(--canvas-soft); }
+.err-box { box-shadow: inset 3px 0 0 var(--ink); font-weight: var(--w-strong); }
+.pastebox { min-height: 160px; font-size: 14px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 40; background: var(--canvas); color: var(--ink); border: 1px solid var(--hairline-soft); padding: 12px 20px; border-radius: var(--r-md); font-size: 14px; box-shadow: var(--float); max-width: calc(100% - 32px); display: flex; gap: 16px; align-items: center; }
+.toast button { border: 0; background: none; color: var(--accent-text); font-weight: var(--w-strong); text-decoration: underline; text-underline-offset: 3px; padding: 0; }
+
+@media (max-width: 760px) {
+  .top { padding-block: 28px 20px; }
+  h1 { font-size: 26px; }
+  .search { max-width: none; flex-basis: 100%; }
+  .gdesc { display: none; }
+  .row.is-sel::before { left: 3px; }
+  .teach { padding: 28px 20px; }
+  .teach h2 { font-size: 26px; }
+  .teach-grid, .how, .alt-grid { grid-template-columns: 1fr; }
+  .pop { left: 0; right: 0; width: auto; }
+  .soform { grid-template-columns: 1fr; }
+  .props { grid-template-columns: 76px minmax(0, 1fr); }
+  .foot { padding-inline: 20px; }
+  .mhead { padding-left: 20px; } .mbody { padding-inline: 20px; } .mfoot { padding-left: 20px; }
+}
+</style>
+
+<div class="main" id="main">
+  <div class="wrap">
+    <header class="top">
+      <div>
+        <h1 id="projectName">Untitled project</h1>
+      </div>
+      <div class="top-actions">
+        <button class="btn tertiary" id="setupBtn" type="button" title="Edit the project name, epics and user types">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16h9a1.5 1.5 0 0 0 1.5-1.5V11"/><path d="M14.5 3.5 16.5 5.5 10 12H8v-2z"/></svg>
+          Edit project
+        </button>
+        <button class="btn" id="epicBtn" type="button" aria-expanded="false" aria-controls="epicPop">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="4" width="14" height="4" rx="2"/><path d="M5 12h6M5 16h4M15 12v5M12.5 14.5h5"/></svg>
+          New epic
+        </button>
+        <button class="btn primary" id="newBtn" type="button">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+          Add requirements
+        </button>
+        <div class="pop" id="epicPop" hidden role="dialog" aria-label="New epic"></div>
+      </div>
+    </header>
+
+    <div id="banner"></div>
+
+    <div class="bar">
+      <nav class="tabs" role="tablist" id="tabs" aria-label="Requirement type"></nav>
+      <div class="toolbar" id="toolbar">
+        <div class="search">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3 3"/></svg>
+          <input id="search" type="search" placeholder="Search ID, title or detail" aria-label="Search requirements" autocomplete="off">
+        </div>
+        <div class="chips" id="priChips" role="group" aria-label="Filter by priority"></div>
+        <button class="btn dd-btn" id="utBtn" type="button" aria-expanded="false" aria-controls="utPop"></button>
+        <span class="spacer"></span>
+        <button class="btn ghost" id="expandBtn" type="button">Collapse all</button>
+        <button class="btn dd-btn" id="displayBtn" type="button" aria-expanded="false" aria-controls="displayPop">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6h9M15 6h2M3 14h3M9 14h8"/><circle cx="13.5" cy="6" r="1.6"/><circle cx="7.5" cy="14" r="1.6"/></svg>
+          Display<span class="dotmark" id="displayDot" hidden></span>
+        </button>
+        <div class="pop" id="utPop" hidden role="dialog" aria-label="Filter by user type"></div>
+        <div class="pop" id="displayPop" hidden role="dialog" aria-label="Display options"></div>
+      </div>
+    </div>
+
+    <section id="list" class="list" aria-label="Requirements"></section>
+    <p class="foot" id="foot"></p>
+  </div>
+</div>
+
+<div class="scrim pane-scrim" id="paneScrim" hidden></div>
+<aside class="pane" id="pane" hidden aria-label="Requirement detail">
+  <div class="phead" id="pHead"></div>
+  <div class="pbody" id="pBody"></div>
+  <div class="pfoot" id="pFoot"></div>
+</aside>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="setup" hidden role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+  <div class="dhead">
+    <h2 id="setupTitle">Edit project</h2>
+    <button class="icon-btn" type="button" data-close-setup aria-label="Close">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg>
+    </button>
+  </div>
+  <div class="dbody" id="setupBody"></div>
+</aside>
+
+<div class="modal-wrap" id="importDlg" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="impTitle">
+    <div class="mhead">
+      <h2 id="impTitle">Import requirements.</h2>
+      <button class="icon-btn" type="button" data-close-import aria-label="Close">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg>
+      </button>
+    </div>
+    <div class="mbody" id="impBody"></div>
+    <div class="mfoot" id="impFoot"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(() => {
+  const KEY = 'reqtracker.v1';
+  const UIKEY = 'reqtracker.ui.v3';
+  const PDF_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+  const PDF_WORKER_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const MAMMOTH_URL = 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
+  const MAX_DOC_CHARS = 120000;
+  const MAX_DRAFTS = 40;
+
+  const TYPES = [
+    { k: 'user', label: 'User', prefix: 'UR', def: 'What people need to be able to do, and who they are.', eg: 'Check out as a guest' },
+    { k: 'business', label: 'Business', prefix: 'BR', def: 'Outcomes, targets and constraints the organisation needs.', eg: 'Increase checkout conversion to 3.2%' },
+    { k: 'technical', label: 'Technical', prefix: 'TR', def: 'Platform, integration, performance and compliance needs.', eg: 'Pages load in under 2.5s on 4G' },
+  ];
+  const TYPE = Object.fromEntries(TYPES.map(t => [t.k, t]));
+  const PRI = [
+    { k: 'must', label: 'Must', long: 'Must have' }, { k: 'should', label: 'Should', long: 'Should have' },
+    { k: 'could', label: 'Could', long: 'Could have' }, { k: 'wont', label: "Won't", long: "Won't have (this time)" },
+  ];
+  const PRI_BY = Object.fromEntries(PRI.map(p => [p.k, p]));
+  const PRI_ORDER = Object.fromEntries(PRI.map((p, i) => [p.k, i]));
+  const STATUS = [{ k: 'draft', label: 'Draft' }, { k: 'review', label: 'In review' }, { k: 'approved', label: 'Approved' }];
+  const STATUS_LABEL = Object.fromEntries(STATUS.map(s => [s.k, s.label]));
+  const TYPE_ORDER = { user: 0, business: 1, technical: 2 };
+
+  const uid = () => Math.random().toString(36).slice(2, 9);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const today = () => new Date().toISOString().slice(0, 10);
+
+  const ICON = {
+    close: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg>',
+    chev: '<svg class="chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 8 4 4 4-4"/></svg>',
+    caret: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" style="width:14px;height:14px"><path d="m6 8 4 4 4-4"/></svg>',
+    plus: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>',
+    pencil: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12.5 4.5 15.5 7.5 7.5 15.5H4.5v-3z"/></svg>',
+    up: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 12 5-5 5 5"/></svg>',
+    down: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 8 5 5 5-5"/></svg>',
+    check: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="m6.8 10.2 2.2 2.2 4.3-4.6"/></svg>',
+    table: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="14" height="12" rx="2"/><path d="M3 8.5h14M3 12.5h14M8 8.5V16"/></svg>',
+    grip: '<svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><circle cx="7.5" cy="5" r="1.4"/><circle cx="12.5" cy="5" r="1.4"/><circle cx="7.5" cy="10" r="1.4"/><circle cx="12.5" cy="10" r="1.4"/><circle cx="7.5" cy="15" r="1.4"/><circle cx="12.5" cy="15" r="1.4"/></svg>',
+    upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6m0 0-2.5 2.5M12 12l2.5 2.5"/></svg>',
+    trash: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 6h10M8 6V4.5h4V6M6.5 6l.6 9.5h5.8l.6-9.5"/></svg>',
+  };
+  const statusIcon = s => s === 'approved'
+    ? '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="var(--ink)"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="var(--canvas)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    : s === 'review'
+      ? '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--ink)" stroke-width="1.6"/><path d="M8 3.6a4.4 4.4 0 0 1 0 8.8z" fill="var(--ink)"/></svg>'
+      : '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="2.6 2.2"/></svg>';
+  const TYPE_ICON = {
+    user: '<circle cx="10" cy="6.5" r="3"/><path d="M4 16.5c.8-3 3.2-4.5 6-4.5s5.2 1.5 6 4.5"/>',
+    business: '<rect x="3" y="6.5" width="14" height="9.5" rx="2"/><path d="M7.5 6.5V5A1.5 1.5 0 0 1 9 3.5h2A1.5 1.5 0 0 1 12.5 5v1.5M3 10.5h14"/>',
+    technical: '<path d="m7 6-4 4 4 4M13 6l4 4-4 4M11 4.5l-2 11"/>',
+  };
+  const typeIcon = k => `<svg class="ticon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TYPE_ICON[k]}</svg>`;
+  const idTag = (r, txt) => `<span class="rid t-${r.type}" title="${TYPE[r.type].label} requirement">${typeIcon(r.type)}${esc(txt || code(r))}</span>`;
+  const typeTag = k => `<span class="ttag t-${k}">${typeIcon(k)}${TYPE[k].label}</span>`;
+  const priTag = (p, long) => `<span class="pri p-${p}" title="${esc(PRI_BY[p].long)}">${esc(long ? PRI_BY[p].long : PRI_BY[p].label)}</span>`;
+  const initials = n => { const w = String(n || '').replace(/\(.*?\)/g, '').trim().split(/[\s,]+/).filter(Boolean); return w.length ? (w[0][0] + (w[1] ? w[1][0] : '')).toUpperCase() : '?'; };
+  const avatar = n => `<span class="av${n ? '' : ' unknown'}" title="Added by ${esc(n || 'unknown')}" aria-label="Added by ${esc(n || 'unknown')}">${esc(initials(n))}</span>`;
+
+  /* ---------- Data ---------- */
+  function assignRanks(reqs) {
+    reqs.slice().sort((x, y) => PRI_ORDER[x.priority] - PRI_ORDER[y.priority] || TYPE_ORDER[x.type] - TYPE_ORDER[y.type] || x.num - y.num).forEach((r, i) => { r.rank = i; });
+  }
+  function sampleState() {
+    const epics = [
+      { id: 'e1', name: 'Account & sign-in', description: 'Registration, sign-in and managing personal details.' },
+      { id: 'e2', name: 'Product discovery', description: 'Search, browse, filtering and product detail pages.' },
+      { id: 'e3', name: 'Checkout & payment', description: 'Basket through to order confirmation, including trade accounts.' },
+      { id: 'e4', name: 'Content management', description: 'How the marketing team creates and publishes content.' },
+      { id: 'e5', name: 'Platform & performance', description: 'Non-functional requirements across the whole site.' },
+    ];
+    const userTypes = [
+      { id: 'u1', name: 'First-time shopper' }, { id: 'u2', name: 'Returning customer' },
+      { id: 'u3', name: 'Trade buyer' }, { id: 'u4', name: 'Content editor' },
+    ];
+    const rows = [
+      ['user', 'e1', 'Create an account after placing an order', 'As a first-time shopper, I want to save my details after checkout so that I don\'t have to register up front.\n\n- Offered on the confirmation page\n- Pre-fills name, email and address', 'must', ['u1'], 'approved'],
+      ['user', 'e1', 'Sign in with a one-time email link', 'As a returning customer, I want to sign in without remembering a password.', 'should', ['u2'], 'review'],
+      ['user', 'e2', 'Filter products by activity and size', 'Filters persist when moving between category pages.', 'must', ['u1', 'u2'], 'approved'],
+      ['user', 'e2', 'See stock at my nearest store', 'Uses postcode or device location, with the customer\'s permission.', 'should', ['u1', 'u2'], 'review'],
+      ['user', 'e2', 'Compare up to three products side by side', '', 'could', ['u2', 'u3'], 'draft'],
+      ['user', 'e2', 'Save products to a wishlist without signing in', 'Deferred to phase 2 following the prioritisation workshop.', 'wont', ['u1'], 'draft'],
+      ['user', 'e3', 'Check out as a guest', 'No account required. Offer account creation after the order is placed (see UR-001).', 'must', ['u1'], 'approved'],
+      ['user', 'e3', 'Pay on account with a PO number', 'Trade buyers with approved credit can skip card payment and enter a purchase order reference.', 'must', ['u3'], 'review'],
+      ['user', 'e3', 'Reorder from order history', '', 'should', ['u2', 'u3'], 'draft'],
+      ['user', 'e4', 'Schedule a campaign page to go live', 'Set a publish and unpublish date and time.', 'should', ['u4'], 'draft'],
+      ['user', 'e4', 'Preview pages on mobile before publishing', '', 'could', ['u4'], 'draft'],
+      ['business', 'e3', 'Increase checkout conversion to 3.2%', 'Baseline 2.4% (last 12 months). Measured in GA4 from basket to order confirmation.', 'must', [], 'approved'],
+      ['business', 'e3', 'Support tiered trade pricing', 'Three price tiers, set per trade account in the ERP.', 'must', [], 'approved'],
+      ['business', 'e1', 'Grow registered customers by 20% in year one', '', 'should', [], 'review'],
+      ['business', 'e4', 'Marketing can launch campaigns without developer support', '', 'should', [], 'approved'],
+      ['business', 'e2', 'Promote own-brand products in search results', 'Boost rules managed by merchandising.', 'could', [], 'draft'],
+      ['business', '', 'Comply with UK GDPR and PECR for consent', 'Cookie consent and marketing opt-ins reviewed by the client\'s legal team.', 'must', [], 'approved'],
+      ['technical', 'e5', 'Largest Contentful Paint under 2.5s on 4G', 'Measured on product listing and product detail templates, 75th percentile field data.', 'must', [], 'approved'],
+      ['technical', 'e5', 'Meet WCAG 2.2 AA', 'Audit before launch and after each major release.', 'must', [], 'approved'],
+      ['technical', 'e5', 'Support the last two versions of major browsers', 'Chrome, Safari (incl. iOS), Edge, Firefox, Samsung Internet.', 'should', [], 'approved'],
+      ['technical', 'e3', 'Integrate card and wallet payments via the payment provider', 'Apple Pay and Google Pay at launch.', 'must', [], 'review'],
+      ['technical', 'e4', 'Headless CMS with scheduled publishing', '', 'must', [], 'approved'],
+      ['technical', 'e2', 'Search with synonyms and typo tolerance', '', 'should', [], 'review'],
+      ['technical', 'e1', 'Single sign-on against the existing customer database', 'Dependency on client IT for API access.', 'should', [], 'draft'],
+    ];
+    const AUTHOR = { user: 'UX lead (example)', business: 'Business analyst (example)', technical: 'Tech lead (example)' };
+    const counters = { user: 0, business: 0, technical: 0 };
+    const now = Date.now();
+    const reqs = rows.map(([type, epicId, title, description, priority, uts, status], i) => {
+      const created = now - (rows.length - i + 48) * 3600e3;
+      const by = AUTHOR[type];
+      const log = [{ t: created, who: by, k: 'created' }];
+      let signoff = null;
+      if (status !== 'draft') log.push({ t: created + 20 * 3600e3, who: 'Business analyst (example)', k: 'status', from: 'Draft', to: 'In review' });
+      if (status === 'approved') {
+        signoff = { by: 'Northwind product owner (example)', date: '2026-10-21', note: 'Agreed in the scope workshop.', t: created + 40 * 3600e3 };
+        log.push({ t: signoff.t, who: 'Business analyst (example)', k: 'signoff', to: signoff.by });
+      }
+      return { id: uid(), type, num: ++counters[type], epicId, title, description, priority, userTypes: uts, status, archived: false, signoff, source: null, log, createdBy: by, created, updated: log[log.length - 1].t };
+    });
+    assignRanks(reqs);
+    return { isSample: true, project: 'Northwind Outdoor · Website redesign', me: '', epics, userTypes, reqs, counters, updated: now };
+  }
+  function emptyState() {
+    return { isSample: false, project: state && !state.isSample ? state.project : 'Untitled project', me: state?.me || '', epics: [], userTypes: [], reqs: [], counters: { user: 0, business: 0, technical: 0 }, updated: Date.now() };
+  }
+  function normalize(s) {
+    s.epics = s.epics || []; s.userTypes = s.userTypes || []; s.me = s.me || '';
+    s.counters = Object.assign({ user: 0, business: 0, technical: 0 }, s.counters || {});
+    s.reqs = (s.reqs || []).map(r => {
+      const n = Object.assign({ description: '', userTypes: [], status: 'draft', priority: 'should', epicId: '', archived: false, signoff: null, source: null, log: [] }, r);
+      if (!n.log.length) n.log = [{ t: n.created || Date.now(), who: '', k: 'created' }];
+      if (n.createdBy === undefined) n.createdBy = n.log[0].who || '';
+      return n;
+    });
+    s.reqs.forEach(r => { s.counters[r.type] = Math.max(s.counters[r.type] || 0, r.num); });
+    if (s.reqs.some(r => typeof r.rank !== 'number')) assignRanks(s.reqs);
+    return s;
+  }
+  let state = null;
+  state = (() => {
+    try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && Array.isArray(s.reqs)) return normalize(s); } } catch (e) {}
+    return sampleState();
+  })();
+  function save() { state.updated = Date.now(); try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  const UI_DEFAULTS = { tab: 'user', group: 'epic', order: 'manual', showEmpty: true, showArchived: false, props: { detail: true, usertypes: true, addedby: true, status: true, priority: true }, collapsed: [], nameDismissed: false };
+  const ui = (() => {
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(UIKEY)) || {}; } catch (e) {}
+    const u = Object.assign({}, UI_DEFAULTS, saved, { props: Object.assign({}, UI_DEFAULTS.props, saved.props || {}) });
+    u.collapsed = new Set(u.collapsed || []);
+    u.search = ''; u.pri = new Set(); u.uts = new Set();
+    u.renaming = null; u.addingEpic = false;
+    return u;
+  })();
+  function saveUi() {
+    try { localStorage.setItem(UIKEY, JSON.stringify({ tab: ui.tab, group: ui.group, order: ui.order, showEmpty: ui.showEmpty, showArchived: ui.showArchived, props: ui.props, collapsed: [...ui.collapsed], nameDismissed: ui.nameDismissed })); } catch (e) {}
+  }
+
+  const code = r => TYPE[r.type].prefix + '-' + String(r.num).padStart(3, '0');
+  const epicName = id => state.epics.find(e => e.id === id)?.name;
+  const utName = id => state.userTypes.find(u => u.id === id)?.name;
+  const byId = id => state.reqs.find(r => r.id === id);
+  const me = () => (state.me || '').trim();
+  const maxRank = () => state.reqs.reduce((m, r) => Math.max(m, r.rank ?? 0), 0);
+  const fmtDay = t => new Date(t).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+
+  function addLog(r, k, from, to) { r.log.push({ t: Date.now(), who: me(), k, from, to }); r.updated = Date.now(); }
+  const display = {
+    title: v => v, priority: v => PRI_BY[v].label, status: v => STATUS_LABEL[v],
+    epicId: v => epicName(v) || 'No epic', userTypes: v => v.map(utName).filter(Boolean).join(', ') || 'none',
+  };
+  function setField(r, field, value) {
+    if (JSON.stringify(r[field]) === JSON.stringify(value)) return false;
+    const from = display[field] ? display[field](r[field]) : undefined;
+    r[field] = value;
+    addLog(r, field, from, display[field] ? display[field](value) : undefined);
+    return true;
+  }
+  function changeType(r, t) {
+    if (r.type === t) return false;
+    const old = code(r);
+    r.type = t; r.num = ++state.counters[t];
+    if (t !== 'user') r.userTypes = [];
+    addLog(r, 'type', old, code(r));
+    return true;
+  }
+  function createReq(data, logExtra) {
+    const r = Object.assign({ id: uid(), description: '', priority: 'should', status: 'draft', epicId: '', userTypes: [], archived: false, signoff: null, source: null, rank: maxRank() + 1 }, data);
+    r.num = ++state.counters[r.type];
+    r.created = r.updated = Date.now();
+    r.createdBy = me();
+    r.log = [Object.assign({ t: r.created, who: me(), k: 'created' }, logExtra || {})];
+    if (r.type !== 'user') r.userTypes = [];
+    state.reqs.push(r);
+    return r;
+  }
+  function findEpic(name) { const n = String(name || '').trim().toLowerCase(); return state.epics.find(x => x.name.toLowerCase() === n); }
+  function epicIdFor(name) {
+    const n = String(name || '').trim(); if (!n) return '';
+    let e = findEpic(n);
+    if (!e) { e = { id: uid(), name: n, description: '' }; state.epics.push(e); }
+    return e.id;
+  }
+  function utIdFor(name) {
+    const n = String(name || '').trim(); if (!n) return '';
+    let u = state.userTypes.find(x => x.name.toLowerCase() === n.toLowerCase());
+    if (!u) { u = { id: uid(), name: n }; state.userTypes.push(u); }
+    return u.id;
+  }
+  function addEpic(name, description) {
+    const n = name.trim();
+    if (!n) return { error: 'Give the epic a name.' };
+    if (findEpic(n)) return { error: `There's already an epic called “${findEpic(n).name}”.` };
+    const e = { id: uid(), name: n, description: (description || '').trim() };
+    state.epics.push(e); save();
+    return { epic: e };
+  }
+
+  /* ---------- Capabilities ---------- */
+  const capUse = name => (window.claude && typeof window.claude.use === 'function') ? window.claude.use(name).catch(() => null) : Promise.resolve(null);
+  let sampleFn = null, aiState = 'checking', downloads = null;
+  capUse('sample').then(s => { sampleFn = s; aiState = s ? 'on' : 'off'; if (!$('#importDlg').hidden && imp.step === 'source') renderImport(); if (!state.reqs.length) renderList(); });
+  capUse('downloads').then(d => { downloads = d; if (!$('#setup').hidden) renderSetup(); });
+
+  /* ---------- List ---------- */
+  const inTab = r => ui.tab === 'all' || r.type === ui.tab;
+  const isFiltering = () => !!(ui.pri.size || ui.uts.size || ui.search.trim());
+  function filtered() {
+    const q = ui.search.trim().toLowerCase();
+    return state.reqs.filter(r => inTab(r) && (ui.showArchived || !r.archived)
+      && (!ui.pri.size || ui.pri.has(r.priority))
+      && (!ui.uts.size || (r.type === 'user' && r.userTypes.some(u => ui.uts.has(u))))
+      && (!q || (code(r) + ' ' + r.title + ' ' + r.description).toLowerCase().includes(q)));
+  }
+  function sortReqs(a, order = ui.order) {
+    const s = a.slice();
+    if (order === 'manual') return s.sort((x, y) => x.rank - y.rank);
+    if (order === 'updated') return s.sort((x, y) => y.updated - x.updated);
+    if (order === 'id') return s.sort((x, y) => TYPE_ORDER[x.type] - TYPE_ORDER[y.type] || x.num - y.num);
+    return s.sort((x, y) => (PRI_ORDER[x.priority] - PRI_ORDER[y.priority]) || x.rank - y.rank);
+  }
+  const canUtGroup = () => ui.tab === 'user' || ui.tab === 'all';
+  const effGroup = (g = ui.group) => (g === 'usertype' && !canUtGroup()) ? 'epic' : g;
+  const typeWord = () => ui.tab === 'all' ? '' : TYPE[ui.tab].label.toLowerCase() + ' ';
+  const showTags = () => ui.props.usertypes && canUtGroup();
+  const crossAllowed = () => ['epic', 'priority', 'status'].includes(effGroup());
+
+  function renderBanner() {
+    let html = '';
+    if (!me() && !ui.nameDismissed) {
+      html += `<div class="namecard"><div><b>Who's adding requirements?</b><span>Add your name so the team can see who added and changed each requirement.</span></div>
+        <form class="namecard-f" data-form="name"><input class="input" id="nameIn" placeholder="Your name, e.g. Sam (UX lead)" autocomplete="name" aria-label="Your name"><button class="btn primary" type="submit">Save name</button><button class="btn ghost" type="button" data-act="name-dismiss">Not now</button></form></div>`;
+    }
+    if (state.isSample) html += `<div class="banner"><span><strong>Example project.</strong> These requirements show how the tracker works. Changes are saved in this browser.</span>
+         <button class="btn" type="button" data-act="clear-sample">Clear examples and start fresh</button></div>`;
+    $('#banner').innerHTML = html;
+  }
+  function renderTabs() {
+    const live = state.reqs.filter(r => !r.archived);
+    $('#tabs').innerHTML = [{ k: 'all', label: 'All' }, ...TYPES].map(t => {
+      const n = t.k === 'all' ? live.length : live.filter(r => r.type === t.k).length;
+      return `<button class="tab${t.k === 'all' ? '' : ' t-' + t.k}" role="tab" type="button" data-tab="${t.k}" aria-selected="${ui.tab === t.k}">${t.k === 'all' ? '' : typeIcon(t.k)}${t.label}<span class="n">${n}</span></button>`;
+    }).join('');
+  }
+  function renderToolbar() {
+    const base = state.reqs.filter(r => inTab(r) && !r.archived);
+    $('#priChips').innerHTML = PRI.map(p => `<button class="chip p-${p.k}" type="button" data-pri="${p.k}" aria-pressed="${ui.pri.has(p.k)}" title="${esc(p.long)}"><span class="cdot"></span>${p.label}<span class="cn">${base.filter(r => r.priority === p.k).length}</span></button>`).join('');
+    if ([...ui.uts].some(id => !state.userTypes.some(u => u.id === id))) ui.uts = new Set([...ui.uts].filter(id => state.userTypes.some(u => u.id === id)));
+    const ub = $('#utBtn');
+    ub.hidden = !(canUtGroup() && state.userTypes.length);
+    const n = ui.uts.size;
+    ub.innerHTML = `${n === 0 ? 'All user types' : n === 1 ? esc(utName([...ui.uts][0])) : `${n} user types`}${ICON.caret}`;
+    ub.classList.toggle('on', n > 0);
+    const p = ui.props, d = UI_DEFAULTS;
+    const changed = ui.group !== d.group || ui.order !== d.order || ui.showEmpty !== d.showEmpty || ui.showArchived !== d.showArchived || Object.keys(d.props).some(k => p[k] !== d.props[k]);
+    $('#displayDot').hidden = !changed;
+    const eb = $('#expandBtn');
+    eb.hidden = effGroup() === 'none';
+  }
+
+  function groupsFor(items) {
+    const g = effGroup();
+    if (g === 'epic') {
+      const gs = state.epics.map(e => ({ key: 'e:' + e.id, name: e.name, desc: e.description, epicId: e.id, preset: { epicId: e.id }, items: items.filter(r => r.epicId === e.id) }));
+      const orphans = items.filter(r => !state.epics.some(e => e.id === r.epicId));
+      if (orphans.length || !state.epics.length) gs.push({ key: 'e:none', name: 'No epic', muted: true, preset: { epicId: '' }, items: orphans });
+      return gs;
+    }
+    if (g === 'priority') return PRI.map(p => ({ key: 'p:' + p.k, name: p.long, pri: p.k, preset: { priority: p.k }, items: items.filter(r => r.priority === p.k) }));
+    if (g === 'status') return STATUS.map(s => ({ key: 's:' + s.k, name: s.label, st: s.k, preset: { status: s.k }, items: items.filter(r => r.status === s.k) }));
+    if (g === 'usertype') {
+      const gs = state.userTypes.map(u => ({ key: 'u:' + u.id, name: u.name, preset: { userTypes: [u.id], type: 'user' }, items: items.filter(r => r.userTypes.includes(u.id)) }));
+      gs.push({ key: 'u:none', name: 'No user type', muted: true, preset: {}, items: items.filter(r => !r.userTypes.length) });
+      return gs;
+    }
+    return [{ key: 'all', name: null, preset: {}, items }];
+  }
+
+  function rowHtml(r) {
+    let tags = '';
+    if (showTags()) {
+      const names = r.userTypes.map(utName).filter(Boolean);
+      tags += names.slice(0, 2).map(n => `<span class="tag" title="${esc(n)}"><span class="tx">${esc(n)}</span></span>`).join('') + (names.length > 2 ? `<span class="tag more" title="${esc(names.slice(2).join(', '))}">+${names.length - 2}</span>` : '');
+    }
+    if (r.archived) tags = `<span class="tag arch"><span class="tx">Archived</span></span>` + tags;
+    const so = r.signoff ? ` · signed off by ${r.signoff.by} on ${fmtDate(r.signoff.date)}` : '';
+    const desc = ui.props.detail && r.description ? `<span class="rdesc">${esc(r.description.replace(/\s+/g, ' '))}</span>` : '';
+    const sel = pane && !pane.isNew && pane.id === r.id;
+    const drag = !r.archived;
+    return `<div class="row${r.priority === 'wont' ? ' is-wont' : ''}${r.archived ? ' is-archived' : ''}${sel ? ' is-sel' : ''}" role="button" tabindex="0" data-open="${r.id}" ${drag ? 'draggable="true"' : ''} ${sel ? 'aria-current="true"' : ''}>
+      ${drag ? `<span class="grip" title="Drag to move" aria-hidden="true">${ICON.grip}</span>` : ''}
+      ${idTag(r)}
+      <span class="rmain"><span class="rtitle">${esc(r.title)}</span>${desc}</span>
+      ${(showTags() || ui.showArchived) && tags ? `<span class="c-tags">${tags}</span>` : ''}
+      ${ui.props.addedby ? `<span class="c-by">${avatar(r.createdBy)}</span>` : ''}
+      ${ui.props.status ? `<span class="c-st" title="${esc(STATUS_LABEL[r.status] + so)}">${statusIcon(r.status)}<span class="stl">${STATUS_LABEL[r.status]}</span></span>` : ''}
+      ${ui.props.priority ? `<span class="c-pri">${priTag(r.priority)}</span>` : ''}
+    </div>`;
+  }
+
+  let groupInfo = {};
+  function renderList() {
+    const list = $('#list');
+    // Fixed columns so every pill sits at the same x-position down the list
+    const cols = [['id', 'ID', '92px'], ['main', 'Requirement', 'minmax(0, 1fr)']];
+    if (showTags() || ui.showArchived) cols.push(['tags', 'User types', 'minmax(0, 240px)']);
+    if (ui.props.addedby) cols.push(['by', 'By', '32px']);
+    if (ui.props.status) cols.push(['st', 'Status', '104px']);
+    if (ui.props.priority) cols.push(['pri', 'Priority', '88px']);
+    list.style.setProperty('--cols', cols.map(c => c[2]).join(' '));
+    list.style.setProperty('--areas', `"${cols.map(c => c[0]).join(' ')}"`);
+    const colhead = `<div class="colhead" aria-hidden="true">${cols.map(([a, l]) => `<span style="grid-area:${a}">${l}</span>`).join('')}</div>`;
+    groupInfo = {};
+
+    if (!state.reqs.length && !state.epics.length) { list.innerHTML = teachHtml(); $('#foot').innerHTML = ''; return; }
+
+    const items = filtered();
+    const tabCount = state.reqs.filter(r => inTab(r) && !r.archived).length;
+    let groups = groupsFor(items);
+    if (isFiltering() || !ui.showEmpty) groups = groups.filter(g => g.items.length);
+    let html = '';
+    if (!groups.length || (effGroup() === 'none' && !items.length && isFiltering())) {
+      html = isFiltering()
+        ? `<div class="empty"><h2>Nothing matches these filters.</h2><p>Try a different search, priority or user type.</p><button class="btn" type="button" data-act="clear-filters">Clear filters</button></div>`
+        : `<div class="empty"><h2>No ${typeWord()}requirements yet.</h2><p>Draft them from a document with Claude, or write the first one yourself.</p><div class="teach-actions" style="justify-content:center"><button class="btn" type="button" data-act="new">Write one manually</button><button class="btn primary" type="button" data-act="import-doc">Add requirements</button></div></div>`;
+    } else {
+      html = groups.map(g => {
+        groupInfo[g.key] = { preset: g.preset, name: g.name };
+        const open = !ui.collapsed.has(g.key) || g.key === 'all';
+        const bodyId = 'g-' + g.key.replace(/[^a-z0-9]/gi, '');
+        const label = g.pri ? priTag(g.pri, true) : g.st ? `<span class="c-st">${statusIcon(g.st)}</span><span class="gname">${esc(g.name)}</span>` : `<span class="gname${g.muted ? ' muted' : ''}">${esc(g.name || '')}</span>`;
+        const ph = `Add a ${typeWord()}requirement${g.name && !g.muted ? ' to ' + g.name : ''}…`;
+        const qa = `<div class="qa">${ICON.plus}<input class="qa-in" data-qa="${esc(g.key)}" placeholder="${esc(ph)}" aria-label="${esc(ph)}" autocomplete="off"><span class="hint">Enter to add · Esc to cancel</span></div>`;
+        const body = sortReqs(g.items).map(rowHtml).join('') + qa;
+        if (g.key === 'all') return `<div class="group" data-gkey="all"><div class="gbody">${body}</div></div>`;
+        const head = ui.renaming === g.key
+          ? `<form class="rename" data-form="rename" data-epic="${g.epicId}"><input class="input" id="renameIn" value="${esc(g.name)}" aria-label="Epic name" autocomplete="off"><button class="btn" type="button" data-act="rename-cancel">Cancel</button><button class="btn primary" type="submit">Save</button></form>`
+          : `<button class="gtoggle" type="button" data-toggle="${esc(g.key)}" aria-expanded="${open}" aria-controls="${bodyId}">${ICON.chev}<span class="gtitles"><span class="gline">${label}<span class="gcount" title="${g.items.length} requirement${g.items.length === 1 ? '' : 's'}">${g.items.length}</span></span>${g.desc ? `<span class="gdesc">${esc(g.desc)}</span>` : ''}</span></button>
+            ${g.epicId ? `<button class="icon-btn gact" type="button" data-rename="${esc(g.key)}" aria-label="Rename ${esc(g.name)}" title="Rename epic">${ICON.pencil}</button>` : ''}
+            <button class="icon-btn gact" type="button" data-qafocus="${esc(g.key)}" aria-label="Add a requirement to ${esc(g.name)}" title="Add a requirement">${ICON.plus}</button>`;
+        return `<div class="group" data-gkey="${esc(g.key)}">
+          <div class="ghead">${head}</div>
+          <div class="gbody" id="${bodyId}" ${open ? '' : 'hidden'}>${body}</div>
+        </div>`;
+      }).join('');
+    }
+    if (items.length) html = colhead + html;
+    if (effGroup() === 'epic' && !isFiltering()) {
+      html += ui.addingEpic
+        ? `<form class="epic-form" data-form="inline-epic"><input class="input" id="inlEpic" placeholder="Epic name, e.g. Onboarding" aria-label="New epic name" autocomplete="off"><button class="btn" type="button" data-act="inline-epic-cancel">Cancel</button><button class="btn primary" type="submit">Add epic</button><span class="errmsg" id="inlEpicErr" hidden></span></form>`
+        : `<button class="add-epic" type="button" data-act="inline-epic">${ICON.plus}Add epic</button>`;
+    }
+    list.innerHTML = html;
+    const arch = state.reqs.filter(r => inTab(r) && r.archived).length;
+    $('#foot').innerHTML = `<span>Showing ${items.length} of ${tabCount} ${typeWord()}requirements${arch && !ui.showArchived ? ` · ${arch} archived, shown from Display` : ''}</span><span>Saved in this browser · Last change ${esc(new Date(state.updated).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }))}</span>`;
+    $('#expandBtn').textContent = $$('[data-toggle]').some(b => ui.collapsed.has(b.dataset.toggle)) ? 'Expand all' : 'Collapse all';
+    if (pane) renderPaneHead();
+  }
+
+  function teachHtml() {
+    const ai = aiState === 'on';
+    return `<div class="teach">
+      <h2>Start your requirements list.</h2>
+      <p>Capture what the project needs in three kinds of requirement, group them into epics, and tag each with a MoSCoW priority. ${ai ? 'The fastest start is to let Claude draft them from a brief, discovery notes or workshop write-up. You review every draft before it is added.' : 'Import a spreadsheet, or add them one at a time.'}</p>
+      <div class="teach-grid">${TYPES.map(t => `<div class="teach-card"><h3>${typeTag(t.k)}</h3><p>${t.def}</p><span class="eg">e.g. “${t.eg}”</span></div>`).join('')}</div>
+      <div class="teach-actions">
+        ${ai ? `<button class="btn primary" type="button" data-act="import-doc">${ICON.upload.replace('viewBox', 'width="16" height="16" viewBox')}Draft from a document <span class="ai-mark">AI</span></button>` : ''}
+        <button class="btn${ai ? '' : ' primary'}" type="button" data-act="import-csv">Import a spreadsheet</button>
+        <button class="btn" type="button" data-act="new-epic">Add an epic</button>
+        <button class="btn" type="button" data-act="new">Write one manually</button>
+      </div>
+    </div>`;
+  }
+
+  function render() {
+    $('#projectName').textContent = state.project || 'Untitled project';
+    renderBanner(); renderTabs(); renderToolbar(); renderList();
+  }
+
+  /* ---------- Popovers with Apply ---------- */
+  let openPopName = null, disp = null, utDraft = null;
+  const POPS = { display: ['#displayPop', '#displayBtn'], ut: ['#utPop', '#utBtn'], epic: ['#epicPop', '#epicBtn'] };
+  function closePops(focusTrigger) {
+    if (!openPopName) return;
+    const [pop, btn] = POPS[openPopName];
+    $(pop).hidden = true; $(btn).setAttribute('aria-expanded', 'false');
+    if (focusTrigger) $(btn).focus();
+    openPopName = null; disp = null; utDraft = null;
+  }
+  function openPop(name) {
+    if (openPopName === name) { closePops(true); return; }
+    closePops();
+    openPopName = name;
+    const [pop, btn] = POPS[name];
+    if (name === 'display') { disp = { group: effGroup(), order: ui.order, showEmpty: ui.showEmpty, showArchived: ui.showArchived, props: Object.assign({}, ui.props) }; renderDisplay(); }
+    if (name === 'ut') { utDraft = new Set(ui.uts); renderUtPop(); const b = $(btn); $(pop).style.left = window.innerWidth > 760 ? b.offsetLeft + 'px' : ''; }
+    if (name === 'epic') renderEpicPop();
+    $(pop).hidden = false; $(btn).setAttribute('aria-expanded', 'true');
+    setTimeout(() => $(pop).querySelector('input, select, button')?.focus(), 0);
+  }
+  function renderDisplay() {
+    const opts = [['epic', 'Epic'], ['priority', 'Priority'], ['status', 'Status'], ...(canUtGroup() ? [['usertype', 'User type']] : []), ['none', 'No grouping']];
+    const props = [['detail', 'Detail preview'], ['usertypes', 'User types'], ['addedby', 'Added by'], ['status', 'Status'], ['priority', 'Priority']];
+    $('#displayPop').innerHTML = `
+      <span class="pop-h">Display</span>
+      <div class="pop-row"><label for="dGroup">Group by</label><select class="select" id="dGroup">${opts.map(([v, l]) => `<option value="${v}" ${disp.group === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+      <div class="pop-row"><label for="dOrder">Order by</label><select class="select" id="dOrder">${[['manual', 'Manual (drag)'], ['priority', 'Priority'], ['id', 'ID'], ['updated', 'Last updated']].map(([v, l]) => `<option value="${v}" ${disp.order === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+      <hr>
+      <div class="pop-row"><label for="dEmpty">Show empty groups</label><span class="switch"><input type="checkbox" id="dEmpty" ${disp.showEmpty ? 'checked' : ''}><span></span></span></div>
+      <div class="pop-row"><label for="dArch">Show archived</label><span class="switch"><input type="checkbox" id="dArch" ${disp.showArchived ? 'checked' : ''}><span></span></span></div>
+      <hr>
+      <span class="pop-sub">Show on each row</span>
+      <div class="propchips">${props.map(([k, l]) => `<button type="button" class="propchip" data-prop="${k}" aria-pressed="${!!disp.props[k]}">${l}</button>`).join('')}</div>
+      <div class="pop-foot"><button class="btn ghost" type="button" data-act="disp-reset">Reset</button><span class="spacer"></span><button class="btn" type="button" data-act="pop-cancel">Cancel</button><button class="btn primary" type="button" data-act="disp-apply">Apply</button></div>`;
+  }
+  function renderUtPop() {
+    const base = state.reqs.filter(r => r.type === 'user' && !r.archived);
+    $('#utPop').innerHTML = `<span class="pop-h">Filter by user type</span>
+      <div class="optlist">${state.userTypes.map(u => `<label class="opt"><input type="checkbox" data-utopt="${u.id}" ${utDraft.has(u.id) ? 'checked' : ''}><span>${esc(u.name)}</span><span class="cn">${base.filter(r => r.userTypes.includes(u.id)).length}</span></label>`).join('')}</div>
+      <div class="pop-foot"><button class="btn ghost" type="button" data-act="ut-clear">Clear</button><span class="spacer"></span><button class="btn" type="button" data-act="pop-cancel">Cancel</button><button class="btn primary" type="button" data-act="ut-apply">Apply</button></div>`;
+  }
+  function renderEpicPop() {
+    $('#epicPop').innerHTML = `<span class="pop-h">New epic</span>
+      <form class="epic-pop-form" data-form="pop-epic">
+        <div class="field"><label for="neName">Name</label><input class="input" id="neName" placeholder="e.g. Onboarding" autocomplete="off"></div>
+        <div class="field"><label for="neDesc">Description <span class="help">optional</span></label><input class="input" id="neDesc" placeholder="What this epic covers" autocomplete="off"></div>
+        <span class="errmsg" id="neErr" hidden></span>
+        <div class="pop-foot"><span class="spacer"></span><button class="btn" type="button" data-act="pop-cancel">Cancel</button><button class="btn primary" type="submit">Add epic</button></div>
+      </form>`;
+  }
+  function afterEpicAdded(e) {
+    if (effGroup() !== 'epic') toast(`Added epic “${e.name}”. Group by epic to see it.`);
+    else {
+      ui.collapsed.delete('e:' + e.id); renderToolbar(); renderList();
+      const qa = document.querySelector(`[data-qa="${CSS.escape('e:' + e.id)}"]`);
+      qa?.scrollIntoView({ block: 'center' }); qa?.focus({ preventScroll: true });
+      toast(`Added epic “${e.name}”`);
+    }
+    if (pane) renderPane();
+  }
+
+  /* ---------- Detail pane: edits are staged until “Update requirement” ---------- */
+  let pane = null; // { id, isNew, draft, leaving, signing, confirmDel }
+  const cur = () => pane ? (pane.isNew ? null : byId(pane.id)) : null;
+  const visibleIds = () => $$('#list [data-open]').map(b => b.dataset.open);
+  const draftFrom = r => ({ type: r.type, title: r.title, description: r.description, priority: r.priority, status: r.status, epicId: r.epicId, userTypes: [...r.userTypes], newEpic: '' });
+  const normTitle = s => String(s || '').replace(/\s*\n\s*/g, ' ').trim();
+  function isDirty() {
+    if (!pane) return false;
+    const d = pane.draft;
+    if (pane.isNew) return !!(normTitle(d.title) || d.description.trim());
+    const r = byId(pane.id); if (!r) return false;
+    const sortJ = a => JSON.stringify([...a].sort());
+    return d.type !== r.type || normTitle(d.title) !== r.title || d.description.trim() !== r.description || d.priority !== r.priority || d.status !== r.status
+      || (d.epicId === '__new' ? !!d.newEpic.trim() : d.epicId !== r.epicId) || (d.type === 'user' && sortJ(d.userTypes) !== sortJ(r.userTypes));
+  }
+  function guard(fn) {
+    if (pane && isDirty()) { pane.leaving = fn; renderFoot(); $('[data-act="leave-keep"]')?.focus(); return; }
+    fn();
+  }
+  function openReqRaw(id) {
+    const r = byId(id); if (!r) return;
+    pane = { id, draft: draftFrom(r) };
+    renderPane(); showPane(); renderList();
+  }
+  const openReq = id => guard(() => openReqRaw(id));
+  function openNew(preset = {}) {
+    guard(() => {
+      const type = preset.type || (ui.tab === 'all' ? 'user' : ui.tab);
+      pane = { isNew: true, draft: Object.assign({ type, title: '', description: '', priority: 'should', status: 'draft', epicId: '', userTypes: ui.uts.size === 1 ? [...ui.uts] : [], newEpic: '' }, preset, { type }) };
+      renderPane(); showPane(); renderList();
+      setTimeout(() => $('#pTitle')?.focus(), 30);
+    });
+  }
+  let paneReturn = null;
+  function showPane() {
+    if ($('#pane').hidden) paneReturn = document.activeElement;
+    $('#pane').hidden = false; $('#paneScrim').hidden = false;
+    document.body.classList.add('pane-open');
+    autosize($('#pTitle'));
+  }
+  function closePaneRaw() {
+    if (!pane) return;
+    const was = pane.id;
+    pane = null;
+    $('#pane').hidden = true; $('#paneScrim').hidden = true;
+    document.body.classList.remove('pane-open');
+    renderList();
+    const row = was && document.querySelector(`[data-open="${was}"]`);
+    (row || (paneReturn && document.contains(paneReturn) ? paneReturn : null))?.focus({ preventScroll: true });
+  }
+  const closePane = () => guard(closePaneRaw);
+
+  function renderPaneHead() {
+    if (!pane) return;
+    const d = pane.draft;
+    if (pane.isNew) {
+      $('#pHead').innerHTML = `<span class="rid t-${d.type}">New ${TYPE[d.type].label.toLowerCase()} requirement</span><span class="spacer"></span><button class="icon-btn" type="button" data-act="close-pane" aria-label="Close">${ICON.close}</button>`;
+      return;
+    }
+    const r = byId(pane.id); if (!r) return;
+    const ids = visibleIds(); const i = ids.indexOf(r.id);
+    const idTxt = d.type !== r.type ? `${code(r)} → new ${TYPE[d.type].prefix} ID` : code(r);
+    $('#pHead').innerHTML = `<span class="rid t-${d.type}">${esc(idTxt)}</span>
+      <span class="pnav"><button class="icon-btn" type="button" data-act="prev" aria-label="Previous requirement (K)" title="Previous (K)" ${i <= 0 ? 'disabled' : ''}>${ICON.up}</button>
+      <span class="pos">${i >= 0 ? `${i + 1} / ${ids.length}` : '–'}</span>
+      <button class="icon-btn" type="button" data-act="next" aria-label="Next requirement (J)" title="Next (J)" ${i < 0 || i >= ids.length - 1 ? 'disabled' : ''}>${ICON.down}</button></span>
+      <span class="spacer"></span>
+      <button class="icon-btn" type="button" data-act="close-pane" aria-label="Close (Esc)" title="Close (Esc)">${ICON.close}</button>`;
+  }
+
+  function renderPane() {
+    if (!pane) return;
+    const r = cur();
+    if (!pane.isNew && !r) { pane = null; closePaneRaw(); return; }
+    const d = pane.draft;
+    const focusId = document.activeElement?.id;
+    renderPaneHead();
+    const epicOpts = `<option value="">No epic</option>` + state.epics.map(e => `<option value="${e.id}" ${e.id === d.epicId ? 'selected' : ''}>${esc(e.name)}</option>`).join('') + `<option value="__new" ${d.epicId === '__new' ? 'selected' : ''}>+ New epic…</option>`;
+    const utRow = d.type === 'user' ? `<span class="lbl">User types</span><div class="utchips">${state.userTypes.length
+      ? state.userTypes.map(u => `<button type="button" class="utchip" id="pUt-${u.id}" data-ut="${u.id}" aria-pressed="${d.userTypes.includes(u.id)}">${esc(u.name)}</button>`).join('')
+      : `<span class="help">No user types yet. <button class="linkbtn" type="button" data-act="setup">Add them in Edit project</button></span>`}</div>` : '';
+    let html = '';
+    if (r) {
+      const via = r.source ? (r.source.kind === 'ai' ? ' · drafted by Claude' : ' · imported') : '';
+      html += `<div class="byline">${avatar(r.createdBy)}<span>Added by <b>${esc(r.createdBy || 'unknown')}</b> on ${esc(fmtDay(r.created))}${via}</span></div>`;
+      if (r.archived) html += `<div class="notice">Archived. It's hidden from the list and counts. Restore it to bring it back.</div>`;
+    }
+    html += `<div class="field"><label for="pTitle">Requirement</label>
+      <textarea id="pTitle" class="title-input" rows="1" placeholder="${d.type === 'user' ? 'e.g. Check out as a guest' : d.type === 'business' ? 'e.g. Increase online revenue by 15%' : 'e.g. Pages load in under 2.5s on 4G'}">${esc(d.title)}</textarea>
+      <span class="errmsg" id="pTitleErr" hidden>Add a short title so the team can find this requirement.</span></div>
+      <div class="props">
+        <span class="lbl">Type</span>
+        <div class="mos types" role="group" aria-label="Type">${TYPES.map(t => `<button type="button" class="t-${t.k}" id="pType-${t.k}" data-settype="${t.k}" aria-pressed="${d.type === t.k}">${typeIcon(t.k)}${t.label}</button>`).join('')}</div>
+        <span class="lbl">Priority</span>
+        <div class="mos" role="group" aria-label="Priority">${PRI.map(p => `<button type="button" class="p-${p.k}" id="pPri-${p.k}" data-setpri="${p.k}" aria-pressed="${d.priority === p.k}" title="${esc(p.long)}">${p.label}</button>`).join('')}</div>
+        <label class="lbl" for="pStatus">Status</label>
+        <select class="select" id="pStatus">${STATUS.map(s => `<option value="${s.k}" ${s.k === d.status ? 'selected' : ''}>${s.label}</option>`).join('')}</select>
+        <label class="lbl" for="pEpic">Epic</label>
+        <div><select class="select" id="pEpic">${epicOpts}</select><input class="input" id="pNewEpic" placeholder="Name the new epic" value="${esc(d.newEpic)}" ${d.epicId === '__new' ? '' : 'hidden'} autocomplete="off" style="margin-top:8px"></div>
+        ${utRow}
+      </div>
+      <div class="field"><label for="pDesc">Detail and acceptance criteria <span class="help">optional</span></label>
+        <textarea class="textarea" id="pDesc" placeholder="${d.type === 'user' ? 'As a [user type], I want to [goal] so that [reason].\n\n- Acceptance criterion\n- Acceptance criterion' : 'Context, measures of success and acceptance criteria…'}">${esc(d.description)}</textarea></div>`;
+    if (r) {
+      if (r.source) html += `<div class="sect"><div class="sect-h"><h3>Source</h3></div><span class="source">${r.source.kind === 'ai' ? 'Drafted by Claude from' : 'Imported from'} <b>${esc(r.source.file || 'pasted text')}</b></span>${r.source.quote ? `<blockquote class="quote">“${esc(r.source.quote)}”</blockquote>` : ''}</div>`;
+      html += `<div class="sect" id="pSign"><div class="sect-h"><h3>Sign-off</h3></div>${signoffHtml(r)}</div>`;
+      html += `<div class="sect"><div class="sect-h"><h3>Activity</h3>${me() ? '' : `<button class="linkbtn" type="button" data-act="setup" style="font-size:13px">Add your name</button>`}</div><ul class="log" id="pLog">${logHtml(r)}</ul></div>`;
+    }
+    $('#pBody').innerHTML = html;
+    renderFoot();
+    autosize($('#pTitle'));
+    const f = focusId && document.getElementById(focusId);
+    if (f && $('#pane').contains(f)) f.focus({ preventScroll: true });
+  }
+
+  function renderFoot() {
+    if (!pane) return;
+    const r = cur(), dirty = isDirty();
+    let foot = '';
+    if (pane.leaving) {
+      foot = pane.isNew
+        ? `<span class="leave">Discard this new requirement?</span><span class="spacer"></span><button class="btn" type="button" data-act="leave-keep">Keep editing</button><button class="btn primary" type="button" data-act="leave-discard">Discard</button>`
+        : `<span class="leave">You have unsaved changes.</span><span class="spacer"></span><button class="btn" type="button" data-act="leave-keep">Keep editing</button><button class="btn ghost" type="button" data-act="leave-discard">Discard</button><button class="btn primary" type="button" data-act="leave-update">Update requirement</button>`;
+    } else if (pane.isNew) {
+      foot = `<span class="spacer"></span><button class="btn ghost" type="button" data-act="close-pane">Cancel</button><button class="btn primary" type="button" data-act="create">Create requirement</button>`;
+    } else if (pane.confirmDel) {
+      foot = `<span class="confirm">Delete ${code(r)} for good? This can't be undone.</span><span class="spacer"></span><button class="btn" type="button" data-act="delete-no">Keep</button><button class="btn danger solid" type="button" data-act="delete-yes">Delete</button>`;
+    } else {
+      const left = r.archived
+        ? `<button class="btn" type="button" data-act="restore">Restore</button><button class="btn ghost" type="button" data-act="delete-ask">Delete</button>`
+        : `<button class="btn ghost" type="button" data-act="archive">Archive</button>`;
+      // While edits are pending, Archive is unavailable anyway, so the footer shows only the pending-change actions
+      foot = dirty
+        ? `<span class="dirty">Unsaved changes</span><span class="spacer"></span><button class="btn ghost" type="button" data-act="discard">Discard</button><button class="btn primary" type="button" data-act="update">Update requirement</button>`
+        : `${left}<span class="spacer"></span><button class="btn primary" type="button" data-act="update" disabled>Update requirement</button>`;
+    }
+    $('#pFoot').innerHTML = foot;
+  }
+
+  function signoffHtml(r) {
+    if (pane.signing) {
+      return `<div class="soform">
+        <div class="field"><label for="soBy">Signed off by</label><input class="input" id="soBy" placeholder="Name and role, e.g. Jo Lee, client product owner" autocomplete="off"></div>
+        <div class="field"><label for="soDate">Date</label><input class="input" id="soDate" type="date" value="${today()}"></div>
+        <div class="field full"><label for="soNote">Note <span class="help">optional</span></label><input class="input" id="soNote" placeholder="e.g. Agreed in the 14 Oct scope review" autocomplete="off"></div>
+        <span class="errmsg full" id="soErr" hidden>Add who signed this off.</span>
+        <div class="acts"><button class="btn ghost" type="button" data-act="so-cancel">Cancel</button><button class="btn primary" type="button" data-act="so-save">Record sign-off</button></div>
+      </div>`;
+    }
+    if (r.signoff) {
+      return `<div class="signed">${ICON.check}<div><p><b>${esc(r.signoff.by)}</b> signed this off on ${esc(fmtDate(r.signoff.date))}.</p>${r.signoff.note ? `<p class="sm">${esc(r.signoff.note)}</p>` : ''}
+        <p class="sm" style="margin-top:6px"><button class="linkbtn" type="button" data-act="so-withdraw">Withdraw sign-off</button></p></div></div>`;
+    }
+    return `<div class="unsigned"><span>${r.status === 'approved' ? 'Marked approved, but no sign-off is recorded yet.' : 'Not signed off yet.'}</span><button class="btn" type="button" data-act="so-open">Record sign-off</button></div>`;
+  }
+
+  function logText(e) {
+    const who = `<b>${esc(e.who || 'Someone')}</b>`;
+    switch (e.k) {
+      case 'created': return `${who} added this${e.file ? ` from <b>${esc(e.file)}</b>${e.via === 'ai' ? ' (Claude draft)' : ''}` : ''}`;
+      case 'title': return `${who} renamed it`;
+      case 'description': return `${who} edited the detail`;
+      case 'priority': return `${who} changed priority from ${esc(e.from)} to <b>${esc(e.to)}</b>`;
+      case 'status': return `${who} changed status from ${esc(e.from)} to <b>${esc(e.to)}</b>`;
+      case 'epicId': return `${who} moved it from ${esc(e.from)} to <b>${esc(e.to)}</b>`;
+      case 'userTypes': return `${who} set user types to <b>${esc(e.to)}</b>`;
+      case 'type': return `${who} changed type: ${esc(e.from)} → <b>${esc(e.to)}</b>`;
+      case 'signoff': return `${who} recorded sign-off by <b>${esc(e.to)}</b>`;
+      case 'signoff-withdrawn': return `${who} withdrew the sign-off by ${esc(e.from)}`;
+      case 'archived': return `${who} archived it`;
+      case 'restored': return `${who} restored it`;
+      default: return `${who} updated it`;
+    }
+  }
+  const LOG_COLOR = { signoff: 'var(--ink)', 'signoff-withdrawn': 'var(--ink)', created: 'var(--ink)', archived: 'var(--faint)' };
+  function logHtml(r) {
+    return r.log.slice().reverse().map(e => `<li><span class="ld" style="--c:${LOG_COLOR[e.k] || 'var(--hairline)'}"></span><span class="lt">${logText(e)}</span><time datetime="${new Date(e.t).toISOString()}" title="${new Date(e.t).toLocaleString()}">${ago(e.t)}</time></li>`).join('');
+  }
+  function ago(t) {
+    const s = (Date.now() - t) / 1000;
+    if (s < 60) return 'just now';
+    if (s < 3600) return Math.floor(s / 60) + ' min ago';
+    if (s < 86400) return Math.floor(s / 3600) + ' h ago';
+    if (s < 86400 * 6) return Math.floor(s / 86400) + ' d ago';
+    return new Date(t).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  }
+  function fmtDate(d) { const x = new Date(d + 'T12:00:00'); return isNaN(x) ? d : x.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }); }
+  function autosize(el) { if (!el) return; el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+
+  function titleError() { $('#pTitle').classList.add('err'); $('#pTitleErr').hidden = false; $('#pTitle').focus(); }
+  function resolveEpic(d, fallback) {
+    if (d.epicId !== '__new') return d.epicId;
+    return d.newEpic.trim() ? epicIdFor(d.newEpic) : fallback;
+  }
+  function applyDraft() {
+    const r = cur(), d = pane.draft;
+    const title = normTitle(d.title);
+    if (!title) { titleError(); return false; }
+    const wasApproved = r.status === 'approved';
+    const epicId = resolveEpic(d, r.epicId);
+    changeType(r, d.type);
+    setField(r, 'title', title);
+    setField(r, 'description', d.description.trim());
+    setField(r, 'priority', d.priority);
+    setField(r, 'status', d.status);
+    setField(r, 'epicId', epicId);
+    if (r.type === 'user') setField(r, 'userTypes', d.userTypes.filter(id => state.userTypes.some(u => u.id === id)));
+    save();
+    if (ui.tab !== 'all' && ui.tab !== r.type) { ui.tab = r.type; saveUi(); }
+    pane.draft = draftFrom(r); pane.leaving = null;
+    if (!wasApproved && r.status === 'approved' && !r.signoff) pane.signing = true;
+    render(); renderPane();
+    toast(`Updated ${code(r)}`);
+    if (pane.signing) $('#soBy')?.focus();
+    return true;
+  }
+  function createFromDraft() {
+    const d = pane.draft;
+    const title = normTitle(d.title);
+    if (!title) { titleError(); return; }
+    const made = createReq({ type: d.type, title, description: d.description.trim(), priority: d.priority, status: d.status, epicId: resolveEpic(d, ''), userTypes: d.userTypes });
+    save();
+    if (ui.tab !== 'all' && ui.tab !== made.type) { ui.tab = made.type; saveUi(); }
+    pane = { id: made.id, draft: draftFrom(made) };
+    render(); renderPane();
+    document.querySelector(`[data-open="${made.id}"]`)?.scrollIntoView({ block: 'nearest' });
+    toast(`Created ${code(made)}`);
+  }
+  function step(dir) {
+    if (!pane || pane.isNew) return;
+    const ids = visibleIds(); const i = ids.indexOf(pane.id);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= ids.length) return;
+    guard(() => {
+      openReqRaw(ids[j]);
+      document.querySelector(`[data-open="${ids[j]}"]`)?.scrollIntoView({ block: 'nearest' });
+    });
+  }
+  // Immediate actions in the pane (sign-off, archive) need a clean draft first
+  function needsClean() { if (isDirty()) { toast('Update or discard your changes first.'); return true; } return false; }
+  function committedImmediate(r) {
+    save(); pane.draft = draftFrom(r);
+    renderTabs(); renderToolbar(); renderList(); renderPane();
+  }
+
+  /* ---------- Drag and drop ---------- */
+  let drag = null, dropTarget = null;
+  function clearDropMarks() { $$('.drop-before, .drop-after, .drop-into').forEach(el => el.classList.remove('drop-before', 'drop-after', 'drop-into')); }
+  function endDrag() { clearDropMarks(); $$('.dragging').forEach(el => el.classList.remove('dragging')); document.body.classList.remove('is-dragging'); drag = null; dropTarget = null; }
+  function moveReq(id, target, fromKey) {
+    const r = byId(id); if (!r) return;
+    const before = { rank: r.rank, epicId: r.epicId, priority: r.priority, status: r.status, logLen: r.log.length, updated: r.updated };
+    const info = groupInfo[target.key] || { preset: {} };
+    const ids = $$(`.group[data-gkey="${CSS.escape(target.key)}"] [data-open]`).map(x => x.dataset.open).filter(x => x !== id);
+    const idx = target.refId ? ids.indexOf(target.refId) + (target.after ? 1 : 0) : ids.length;
+    const prev = idx > 0 ? byId(ids[idx - 1])?.rank : undefined, next = idx < ids.length ? byId(ids[idx])?.rank : undefined;
+    r.rank = prev === undefined && next === undefined ? maxRank() + 1 : prev === undefined ? next - 1 : next === undefined ? prev + 1 : (prev + next) / 2;
+    let moved = false;
+    if (target.key !== fromKey) for (const f of ['epicId', 'priority', 'status']) if (f in info.preset && setField(r, f, info.preset[f])) moved = true;
+    r.updated = Date.now();
+    save(); renderTabs(); renderToolbar(); renderList();
+    if (pane && pane.id === id) { pane.draft = draftFrom(r); renderPane(); }
+    document.querySelector(`[data-open="${id}"]`)?.focus({ preventScroll: true });
+    toast(moved ? `Moved ${code(r)} to ${info.name}` : `Moved ${code(r)}`, 'Undo', () => {
+      Object.assign(r, { rank: before.rank, epicId: before.epicId, priority: before.priority, status: before.status, updated: before.updated });
+      r.log.length = before.logLen;
+      save(); render(); if (pane && pane.id === id) { pane.draft = draftFrom(r); renderPane(); }
+    });
+  }
+  const listEl = $('#list');
+  listEl.addEventListener('dragstart', e => {
+    const row = e.target.closest?.('.row[data-open]');
+    if (!row) return;
+    if (pane && pane.id === row.dataset.open && isDirty()) { e.preventDefault(); toast('Update or discard your changes before moving this requirement.'); return; }
+    drag = { id: row.dataset.open, fromKey: row.closest('.group')?.dataset.gkey };
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', drag.id); } catch (err) {}
+    requestAnimationFrame(() => row.classList.add('dragging'));
+    document.body.classList.add('is-dragging');
+  });
+  listEl.addEventListener('dragover', e => {
+    if (!drag) return;
+    const group = e.target.closest?.('.group[data-gkey]'); if (!group) return;
+    const key = group.dataset.gkey, cross = key !== drag.fromKey, manual = ui.order === 'manual';
+    if ((cross && !crossAllowed()) || (!cross && !manual)) { clearDropMarks(); dropTarget = null; return; }
+    e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+    clearDropMarks();
+    const row = e.target.closest('.row[data-open]');
+    if (row && manual && row.dataset.open !== drag.id && !group.querySelector('.gbody')?.hidden) {
+      const rect = row.getBoundingClientRect(), after = e.clientY > rect.top + rect.height / 2;
+      row.classList.add(after ? 'drop-after' : 'drop-before');
+      dropTarget = { key, refId: row.dataset.open, after };
+    } else if (row && row.dataset.open === drag.id) { dropTarget = null; }
+    else { group.classList.add('drop-into'); dropTarget = { key, refId: null }; }
+  });
+  listEl.addEventListener('dragleave', e => { if (!listEl.contains(e.relatedTarget)) clearDropMarks(); });
+  listEl.addEventListener('drop', e => {
+    e.preventDefault();
+    if (drag && dropTarget) moveReq(drag.id, dropTarget, drag.fromKey);
+    endDrag();
+  });
+  document.addEventListener('dragend', endDrag);
+  function moveByKey(row, dir) {
+    if (ui.order !== 'manual') { toast('Set Order by to Manual in Display to reorder.'); return; }
+    const group = row.closest('.group'); const ids = [...group.querySelectorAll('[data-open]')].map(x => x.dataset.open);
+    const i = ids.indexOf(row.dataset.open), j = i + dir;
+    if (j < 0 || j >= ids.length) return;
+    moveReq(row.dataset.open, { key: group.dataset.gkey, refId: ids[j], after: dir > 0 }, group.dataset.gkey);
+  }
+
+  /* ---------- Toast ---------- */
+  let toastT, toastAction = null;
+  function toast(msg, actionLabel, action) {
+    const t = $('#toast');
+    t.innerHTML = `<span>${esc(msg)}</span>${actionLabel ? `<button type="button" id="toastAct">${esc(actionLabel)}</button>` : ''}`;
+    toastAction = action || null; t.hidden = false;
+    clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; toastAction = null; }, actionLabel ? 6000 : 2600);
+  }
+
+  /* ---------- Setup ---------- */
+  let setupConfirm = '', setupReturn = null;
+  function renderSetup() {
+    const cE = id => state.reqs.filter(r => r.epicId === id && !r.archived).length;
+    const cU = id => state.reqs.filter(r => r.userTypes.includes(id) && !r.archived).length;
+    $('#setupBody').innerHTML = `
+      <div class="ssect">
+        <div class="field"><label for="sProject">Project name</label><input class="input" id="sProject" value="${esc(state.project)}" autocomplete="off"></div>
+        <div class="field"><label for="sMe">Your name <span class="help">shown as who added and changed requirements</span></label><input class="input" id="sMe" value="${esc(state.me)}" placeholder="e.g. Sam (UX lead)" autocomplete="name"></div>
+      </div>
+      <div class="ssect">
+        <h3>Epics</h3><p>Rename, reorder or remove epics. Deleting an epic keeps its requirements under “No epic”.</p>
+        <div class="slist">${state.epics.map(e => `<div class="sitem">
+          <input class="input" id="ep-${e.id}" data-epic-name="${e.id}" value="${esc(e.name)}" aria-label="Epic name">
+          <span class="cnt" title="Requirements in this epic">${cE(e.id)}</span>
+          <button class="icon-btn" type="button" data-epic-up="${e.id}" aria-label="Move ${esc(e.name)} up">${ICON.up}</button>
+          <button class="icon-btn" type="button" data-epic-del="${e.id}" aria-label="Delete ${esc(e.name)}">${ICON.trash}</button></div>`).join('') || '<p>No epics yet.</p>'}</div>
+        <form class="addline" data-add-form="epic"><input class="input" id="newEpicName" placeholder="Add an epic, e.g. Onboarding" autocomplete="off"><button class="btn" type="submit">Add epic</button></form>
+      </div>
+      <div class="ssect">
+        <h3>User types</h3><p>Personas or audiences you can tag on user requirements.</p>
+        <div class="slist">${state.userTypes.map(u => `<div class="sitem">
+          <input class="input" id="ut-${u.id}" data-ut-name="${u.id}" value="${esc(u.name)}" aria-label="User type name">
+          <span class="cnt" title="Requirements tagged">${cU(u.id)}</span>
+          <button class="icon-btn" type="button" data-ut-del="${u.id}" aria-label="Delete ${esc(u.name)}">${ICON.trash}</button></div>`).join('') || '<p>No user types yet.</p>'}</div>
+        <form class="addline" data-add-form="ut"><input class="input" id="newUtName" placeholder="Add a user type, e.g. Store colleague" autocomplete="off"><button class="btn" type="submit">Add user type</button></form>
+      </div>
+      <div class="ssect">
+        <h3>Data</h3><p>Everything is saved in this browser only. Export a CSV to share with the team or open in a spreadsheet.</p>
+        <div class="row-btns">
+          ${downloads ? `<button class="btn" type="button" data-act="csv-download">Download CSV</button>` : ''}
+          <button class="btn" type="button" data-act="csv-copy">Copy as CSV</button>
+          <button class="btn" type="button" data-act="import">Import…</button>
+        </div>
+        <div class="row-btns">
+          <button class="btn ghost" type="button" data-act="restore-sample">Load example project</button>
+          <button class="btn ghost" type="button" data-act="wipe">Clear everything</button>
+        </div>
+        ${setupConfirm ? `<div class="confirm">${setupConfirm === 'wipe' ? 'Delete all requirements, epics and user types?' : 'Replace everything with the example project?'}
+          <button class="btn danger solid" type="button" data-confirm="${setupConfirm}">${setupConfirm === 'wipe' ? 'Clear everything' : 'Replace'}</button>
+          <button class="btn ghost" type="button" data-confirm="no">Cancel</button></div>` : ''}
+        <textarea class="textarea" id="csvOut" readonly hidden aria-label="CSV export"></textarea>
+      </div>`;
+  }
+  function openSetup() {
+    closePops();
+    setupConfirm = ''; setupReturn = document.activeElement;
+    renderSetup(); $('#setup').hidden = false; $('#scrim').hidden = false;
+    setTimeout(() => $('#sProject').focus(), 30);
+  }
+  function closeSetup() {
+    $('#setup').hidden = true; $('#scrim').hidden = true;
+    if (setupReturn && document.contains(setupReturn)) setupReturn.focus();
+  }
+
+  function toCsv() {
+    const cell = v => { const s = String(v ?? ''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+    const head = ['ID', 'Type', 'Epic', 'Requirement', 'Detail', 'Priority', 'User types', 'Status', 'Added by', 'Added on', 'Signed off by', 'Sign-off date', 'Archived'];
+    const rows = state.reqs.slice().sort((a, b) => TYPE_ORDER[a.type] - TYPE_ORDER[b.type] || a.num - b.num)
+      .map(r => [code(r), TYPE[r.type].label, epicName(r.epicId) || '', r.title, r.description, PRI_BY[r.priority].label, r.userTypes.map(utName).filter(Boolean).join('; '), STATUS_LABEL[r.status], r.createdBy || '', new Date(r.created).toISOString().slice(0, 10), r.signoff?.by || '', r.signoff?.date || '', r.archived ? 'Yes' : '']);
+    return [head, ...rows].map(r => r.map(cell).join(',')).join('\n');
+  }
+  const slug = s => (s || 'requirements').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'requirements';
+
+  /* ---------- Import (document via Claude, or CSV) ---------- */
+  const imp = { step: 'source', mode: 'doc', file: null, paste: '', pasteOpen: false, text: '', truncated: false, cands: [], found: 0, thinking: true, ctl: null, error: '', label: '' };
+  let impReturn = null;
+  function openImport(mode) {
+    closePops();
+    if (!$('#setup').hidden) closeSetup();
+    Object.assign(imp, { step: 'source', file: null, paste: '', pasteOpen: false, text: '', truncated: false, cands: [], error: '' });
+    if (mode) imp.mode = mode;
+    impReturn = document.activeElement;
+    $('#importDlg').hidden = false;
+    renderImport();
+    setTimeout(() => $('#impBody').querySelector('input, textarea, button')?.focus(), 30);
+  }
+  function closeImport() {
+    imp.ctl?.abort();
+    $('#importDlg').hidden = true;
+    if (impReturn && document.contains(impReturn)) impReturn.focus();
+  }
+  const fmtSize = b => b > 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB';
+
+  function renderImport() {
+    const body = $('#impBody'), foot = $('#impFoot');
+    if (imp.step === 'review') $('#impTitle').textContent = 'Review before adding.';
+    else if (imp.step !== 'source') $('#impTitle').textContent = 'Add requirements.';
+    if (imp.step === 'source') {
+      $('#impTitle').textContent = imp.mode === 'csv' ? 'Import a spreadsheet.' : 'Add requirements.';
+      const sampleNote = state.isSample && state.reqs.length ? `<div class="warn">You're in the example project, so new requirements will sit alongside the examples. <button class="linkbtn" type="button" data-act="clear-sample-import">Clear the examples first</button></div>` : '';
+      let main = '', foot = '';
+      if (imp.mode === 'doc') {
+        // Primary path: drop a document and Claude drafts. Manual entry and spreadsheets are secondary.
+        const alt = `<div class="alt"><span class="alt-label">${aiState === 'off' ? 'Choose how to add requirements' : 'Or add them another way'}</span><div class="alt-grid">
+            <button class="alt-card" type="button" data-act="manual">${ICON.pencil}<span><b>Write one manually</b><span>Open a blank requirement and fill it in yourself.</span></span></button>
+            <button class="alt-card" type="button" data-impmode="csv">${ICON.table}<span><b>Import a spreadsheet</b><span>A CSV, or rows pasted from Excel or Google Sheets.</span></span></button>
+          </div></div>`;
+        if (aiState === 'checking') main = `<div class="drop hero is-wait"><div class="spinner" aria-hidden="true"></div><span>Checking whether Claude is available here…</span></div>` + alt;
+        else if (aiState === 'off') main = `<div class="notice">Drafting requirements from a document works when this page is open in Claude. You can still write them yourself or import a spreadsheet.</div>` + alt;
+        else {
+          main = `<label class="drop hero" id="drop">${ICON.upload}<strong>Drop a document to draft requirements</strong><span>A brief, discovery findings, workshop notes or an RFP · PDF, Word, .txt or .md</span><span class="ai-mark">AI · Claude drafts, you review</span><input type="file" id="docFile" accept=".pdf,.docx,.txt,.md,.markdown,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Choose a document to draft requirements from"></label>
+            ${imp.pasteOpen
+              ? `<div class="field"><label for="pasteDoc">Paste text</label><textarea class="textarea pastebox" id="pasteDoc" placeholder="Paste notes, an email thread or part of a brief…">${esc(imp.paste)}</textarea></div>`
+              : `<button class="linkbtn" type="button" data-act="paste-open" style="align-self:center">Paste text instead</button>`}
+            <ol class="how">
+              <li><b>Add a document</b>Drafting starts as soon as you drop or choose a file.</li>
+              <li><b>Claude drafts</b>User, business and technical requirements with a priority, an epic and a supporting quote.</li>
+              <li><b>You review</b>Edit or untick anything before it’s added. Everything starts as Draft.</li></ol>` + alt;
+        }
+        foot = `${aiState === 'on' ? `<span class="note">Uses your Claude usage. Claude asks you to allow this page the first time.</span>` : ''}<span class="spacer"></span><button class="btn ghost" type="button" data-close-import>Cancel</button>`
+          + (aiState === 'on' && imp.pasteOpen ? `<button class="btn primary" type="button" data-act="imp-go" ${imp.paste.trim() ? '' : 'disabled'}>Draft requirements</button>` : '');
+      } else {
+        main = `<button class="linkbtn" type="button" data-impmode="doc" style="align-self:flex-start">← All ways to add requirements</button>
+          <p class="help" style="margin:0;font-size:14px">Bring in a list from Excel, Google Sheets or a workshop board export. We recognise columns called <b>Requirement</b> or <b>Title</b> (required), and optionally <b>Type</b>, <b>Epic</b>, <b>Detail</b>, <b>Priority</b>, <b>User types</b> and <b>Status</b>. You'll preview everything before it's added.</p>
+          ${imp.file ? fileChip() : `<label class="drop" id="drop">${ICON.upload}<strong>Drop a CSV here or choose a file</strong><span>.csv or .tsv, exported from any spreadsheet</span><input type="file" id="docFile" accept=".csv,.tsv,text/csv,text/tab-separated-values"></label>`}
+          ${imp.file ? '' : `<div class="field"><label for="pasteDoc">Or paste rows copied from a spreadsheet</label><textarea class="textarea pastebox" id="pasteDoc" placeholder="Requirement&#9;Type&#9;Priority&#10;Check out as a guest&#9;User&#9;Must">${esc(imp.paste)}</textarea></div>`}`;
+        foot = `<span class="spacer"></span><button class="btn ghost" type="button" data-close-import>Cancel</button><button class="btn primary" type="button" data-act="imp-go" ${imp.file || imp.paste.trim() ? '' : 'disabled'}>Preview import</button>`;
+      }
+      body.innerHTML = sampleNote + main + (imp.error ? `<div class="err-box" role="alert">${esc(imp.error)}</div>` : '');
+      $('#impFoot').innerHTML = foot;
+      bindDrop();
+    } else if (imp.step === 'reading') {
+      body.innerHTML = `<div class="working"><div class="spinner" aria-hidden="true"></div><span class="big">Reading ${esc(imp.label)}…</span><span class="sub">Extracting the text in your browser.</span></div>`;
+      foot.innerHTML = `<span class="spacer"></span><button class="btn ghost" type="button" data-close-import>Cancel</button>`;
+    } else if (imp.step === 'drafting') {
+      body.innerHTML = `<div class="working" aria-live="polite"><div class="spinner" aria-hidden="true"></div>
+        ${imp.thinking ? `<span class="big">Claude is reading ${esc(imp.label)}…</span><span class="sub">This usually takes under a minute for a long document. If a permission prompt appears, allow it to continue.</span>`
+          : `<span class="count-big">${imp.found}</span><span class="big">requirement${imp.found === 1 ? '' : 's'} drafted so far</span><span class="sub">You'll review them all before anything is added.</span>`}</div>
+        ${imp.truncated ? `<div class="warn">This document is long, so Claude is reading the first ${Math.round(MAX_DOC_CHARS / 1000)},000 characters. Run the rest as a second import if needed.</div>` : ''}`;
+      foot.innerHTML = `<span class="spacer"></span><button class="btn" type="button" data-act="imp-stop">Stop</button>`;
+    } else if (imp.step === 'review') {
+      renderReview();
+    }
+  }
+  function fileChip() {
+    return `<div class="filechip">${ICON.upload.replace('viewBox', 'width="22" height="22" viewBox')}<span class="fn">${esc(imp.file.name)}</span><span class="fs">${fmtSize(imp.file.size)}</span><span class="spacer"></span><button class="btn" type="button" data-act="imp-clear-file">Remove</button></div>`;
+  }
+  function bindDrop() {
+    const d = $('#drop'); const inp = $('#docFile');
+    const pick = f => { imp.file = f; imp.error = ''; if (imp.mode === 'doc') runImport(); else renderImport(); };
+    if (inp) inp.addEventListener('change', () => { if (inp.files[0]) pick(inp.files[0]); });
+    if (d) {
+      d.addEventListener('dragover', e => { e.preventDefault(); d.classList.add('over'); });
+      d.addEventListener('dragleave', () => d.classList.remove('over'));
+      d.addEventListener('drop', e => { e.preventDefault(); d.classList.remove('over'); const f = e.dataTransfer.files[0]; if (f) pick(f); });
+    }
+    const p = $('#pasteDoc');
+    if (p) p.addEventListener('input', () => { imp.paste = p.value; const b = $('[data-act="imp-go"]'); if (b) b.disabled = !p.value.trim(); });
+  }
+
+  const loaded = {};
+  function loadScript(src) {
+    return loaded[src] ||= new Promise((res, rej) => {
+      const s = document.createElement('script'); s.src = src; s.onload = res;
+      s.onerror = () => { delete loaded[src]; rej(new Error('load')); };
+      document.head.appendChild(s);
+    });
+  }
+  async function extractText(file) {
+    const name = file.name.toLowerCase();
+    if (/\.(txt|md|markdown|csv|tsv)$/.test(name) || file.type.startsWith('text/')) return await file.text();
+    if (name.endsWith('.docx')) {
+      await loadScript(MAMMOTH_URL);
+      const out = await window.mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+      return out.value;
+    }
+    if (name.endsWith('.pdf') || file.type === 'application/pdf') {
+      await loadScript(PDF_WORKER_URL); await loadScript(PDF_URL);
+      const lib = window.pdfjsLib; lib.GlobalWorkerOptions.workerSrc = PDF_WORKER_URL;
+      const doc = await lib.getDocument({ data: new Uint8Array(await file.arrayBuffer()), isEvalSupported: false }).promise;
+      const parts = [];
+      for (let i = 1; i <= Math.min(doc.numPages, 300); i++) {
+        const tc = await (await doc.getPage(i)).getTextContent();
+        parts.push(tc.items.map(it => it.str + (it.hasEOL ? '\n' : ' ')).join(''));
+        if (parts.join('').length > MAX_DOC_CHARS * 1.2) break;
+      }
+      return parts.join('\n\n');
+    }
+    throw new Error('type');
+  }
+
+  function buildPrompt(text, label) {
+    const epics = state.epics.map(e => e.name);
+    const uts = state.userTypes.map(u => u.name);
+    const existing = state.reqs.filter(r => !r.archived).slice(0, 200).map(r => `${code(r)} ${r.title}`);
+    return `You are helping a team at a digital design agency turn a project document into a requirements list for their requirements tracker.
+
+Project: ${state.project}
+Existing epics: ${epics.length ? epics.join('; ') : 'none yet'}
+Existing user types: ${uts.length ? uts.join('; ') : 'none yet'}
+Existing requirements (do not repeat these):
+${existing.length ? existing.map(s => '- ' + s).join('\n') : '- none yet'}
+
+Requirement types:
+- "user": something a person needs to be able to do. Title: a short capability, e.g. "Check out as a guest". Description: "As a <user type>, I want <goal> so that <reason>." then acceptance criteria as lines starting "- ".
+- "business": an outcome, target or constraint the organisation needs, measurable where the document allows. Description: context and how success is measured.
+- "technical": platform, integration, data, performance, security, accessibility or compliance needs. Description: specifics and acceptance criteria.
+
+Priority uses MoSCoW: "must", "should", "could" or "wont". Base it on the document's own language ("must", "essential", "launch", "nice to have", "phase 2", "out of scope"). Use "should" when the document gives no signal.
+
+Epic: reuse an existing epic name exactly when one fits; otherwise propose a short new epic name of 2-4 words. Keep the number of new epics small.
+User types (user requirements only): reuse existing user type names exactly when they fit; propose a new one only when the document clearly names a distinct audience.
+
+Only include requirements the document actually supports; do not invent features. Combine near-duplicates. For each, include "quote": a short verbatim excerpt (at most 25 words) from the document that supports it.
+Return at most ${MAX_DRAFTS} requirements, most important first.
+
+Reply with only JSON in this shape:
+{"requirements":[{"type":"user","title":"…","description":"…","priority":"should","epic":"…","userTypes":["…"],"quote":"…"}]}
+
+Document (${label}):
+"""
+${text}
+"""`;
+  }
+
+  const AI_ERR = {
+    not_granted: ['Claude wasn\'t allowed to run for this page, so drafting is off for now. You can still import a spreadsheet.', true],
+    sampling_disabled: ['Claude isn\'t available for your account here. You can still import a spreadsheet.', true],
+    not_declared: ['Drafting with Claude isn\'t available on this page.', true], capability_disabled: ['Drafting with Claude isn\'t available in this view.', true], capability_removed: ['Drafting with Claude isn\'t available in this view.', true],
+    rate_limited: ['You\'ve reached a Claude usage limit for now. Try again in a little while.'],
+    session_expired: ['Your Claude session has expired. Sign in again, then try once more.'],
+    refused: ['Claude couldn\'t draft requirements from this document. Try a different document, or paste the relevant section.'],
+    prompt_too_large: ['That document is too long to read in one go. Paste the most relevant section instead.'],
+    invalid_json: ['The draft came back incomplete. Try again, or use a shorter section of the document.'],
+    empty_completion: ['Claude returned nothing for this document. Try a shorter or more specific section.'],
+  };
+
+  async function runImport() {
+    imp.error = '';
+    const label = imp.file ? imp.file.name : 'pasted text';
+    imp.label = label;
+    let text = imp.paste;
+    if (imp.file) {
+      imp.step = 'reading'; renderImport();
+      try { text = await extractText(imp.file); }
+      catch (e) {
+        imp.step = 'source';
+        imp.error = e.message === 'type'
+          ? `We can't read ${label}. Save it as PDF, Word (.docx), .txt or .md and try again.`
+          : `We couldn't read ${label}. If it's a scanned PDF, it may contain no selectable text; try a Word version or paste the text.`;
+        renderImport(); return;
+      }
+      if ($('#importDlg').hidden) return;
+    }
+    text = (text || '').replace(/\u0000/g, '').trim();
+    if (!text) { imp.step = 'source'; imp.error = `${label} has no readable text. If it's a scanned PDF, paste the text instead.`; renderImport(); return; }
+
+    if (imp.mode === 'csv') {
+      const res = csvToCands(text);
+      if (res.error) { imp.step = 'source'; imp.error = res.error; renderImport(); return; }
+      imp.cands = res.cands; imp.via = 'csv'; imp.step = 'review'; renderImport(); return;
+    }
+
+    imp.truncated = text.length > MAX_DOC_CHARS;
+    if (imp.truncated) text = text.slice(0, MAX_DOC_CHARS);
+    imp.step = 'drafting'; imp.thinking = true; imp.found = 0; renderImport();
+    const ctl = new AbortController(); imp.ctl = ctl;
+    try {
+      const data = await sampleFn.json(buildPrompt(text, label), {
+        signal: ctl.signal, modelTier: 'default', cache: false,
+        onText: ({ text: t }) => {
+          const n = (t.match(/"title"\s*:/g) || []).length;
+          if (imp.thinking || n !== imp.found) { imp.thinking = false; imp.found = n; if (imp.step === 'drafting') renderImport(); }
+        },
+      });
+      const arr = Array.isArray(data) ? data : Array.isArray(data?.requirements) ? data.requirements : [];
+      const cands = arr.map(normCand).filter(Boolean);
+      if (!cands.length) { imp.step = 'source'; imp.error = `Claude didn't find requirements in ${label}. Try a document that describes what the product needs to do.`; renderImport(); return; }
+      imp.cands = markDups(cands); imp.via = 'ai'; imp.step = 'review'; renderImport();
+    } catch (e) {
+      if ($('#importDlg').hidden) return;
+      imp.step = 'source';
+      if (e?.code === 'cancelled') { imp.error = ''; renderImport(); return; }
+      const [msg, off] = AI_ERR[e?.code] || ['Something went wrong reaching Claude. Try again in a moment.'];
+      if (off) { aiState = 'off'; }
+      imp.error = msg; renderImport();
+    } finally { imp.ctl = null; }
+  }
+
+  function normType(v, idv) {
+    const s = String(v || '').trim().toLowerCase(), id = String(idv || '').trim().toUpperCase();
+    if (/^u/.test(s) || /^f/.test(s) || id.startsWith('UR')) return 'user';
+    if (/^b/.test(s) || id.startsWith('BR')) return 'business';
+    if (/^t/.test(s) || /^n/.test(s) || id.startsWith('TR')) return 'technical';
+    return null;
+  }
+  function normPri(v) {
+    const s = String(v || '').trim().toLowerCase();
+    if (/^(must|m)\b|^m$|critical|high|p1|essential/.test(s)) return 'must';
+    if (/^(should|s)\b|^s$|medium|p2/.test(s)) return 'should';
+    if (/^(could|c)\b|^c$|low|p3|nice/.test(s)) return 'could';
+    if (/^won|^w$|p4|out of scope/.test(s)) return 'wont';
+    return 'should';
+  }
+  function normStatus(v) { const s = String(v || '').toLowerCase(); return /approv|signed|agreed|done/.test(s) ? 'approved' : /review/.test(s) ? 'review' : 'draft'; }
+  function normCand(c) {
+    if (!c || typeof c !== 'object') return null;
+    const title = String(c.title || '').replace(/\s+/g, ' ').trim();
+    if (!title) return null;
+    const type = normType(c.type) || 'user';
+    const uts = type === 'user' && Array.isArray(c.userTypes) ? c.userTypes.map(x => String(x).trim()).filter(Boolean).slice(0, 4) : [];
+    return { sel: true, type, title: title.slice(0, 200), description: String(c.description || '').trim(), priority: normPri(c.priority), status: 'draft', epic: String(c.epic || '').trim().slice(0, 60), userTypes: uts, quote: String(c.quote || '').trim().slice(0, 300) };
+  }
+  function markDups(cands) {
+    const seen = new Map(state.reqs.map(r => [r.title.trim().toLowerCase(), r]));
+    cands.forEach(c => { const d = seen.get(c.title.toLowerCase()); if (d) { c.dup = code(d); c.sel = false; } });
+    return cands;
+  }
+
+  function parseDelimited(text) {
+    const first = text.split('\n')[0];
+    const delim = (first.match(/\t/g) || []).length > (first.match(/,/g) || []).length ? '\t' : ((first.match(/;/g) || []).length > (first.match(/,/g) || []).length ? ';' : ',');
+    const rows = []; let row = [], f = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (q) { if (ch === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += ch; }
+      else if (ch === '"' && f === '') q = true;
+      else if (ch === delim) { row.push(f); f = ''; }
+      else if (ch === '\n') { row.push(f); rows.push(row); row = []; f = ''; }
+      else if (ch !== '\r') f += ch;
+    }
+    if (f !== '' || row.length) { row.push(f); rows.push(row); }
+    return rows.filter(r => r.some(x => x.trim()));
+  }
+  function csvToCands(text) {
+    const rows = parseDelimited(text.replace(/^﻿/, ''));
+    if (rows.length < 2) return { error: 'We need a header row and at least one requirement. Check the file has column names in its first row.' };
+    const head = rows[0].map(h => h.trim().toLowerCase());
+    const find = (...res) => head.findIndex(h => res.some(re => re.test(h)));
+    const iTitle = find(/^(requirement|requirements|title|name|summary|requirement title|user story|story)$/);
+    if (iTitle < 0) return { error: `We couldn't find a column called Requirement or Title. The columns we found were: ${rows[0].filter(Boolean).slice(0, 8).join(', ')}.` };
+    const iId = find(/^(id|ref|reference|key)$/), iType = find(/^(type|requirement type|category|kind)$/), iDesc = find(/detail|description|acceptance|notes?$/);
+    const iPri = find(/priority|moscow/), iEpic = find(/epic|group|theme|feature area|area/), iUt = find(/user ?types?|persona|audience|user group/), iStatus = find(/^status$/);
+    const defType = ui.tab === 'all' ? 'user' : ui.tab;
+    const get = (r, i) => i >= 0 ? (r[i] || '').trim() : '';
+    const cands = rows.slice(1).map(r => {
+      const title = get(r, iTitle).replace(/\s+/g, ' ');
+      if (!title) return null;
+      const type = normType(get(r, iType), get(r, iId)) || defType;
+      return { sel: true, type, title, description: get(r, iDesc), priority: iPri >= 0 ? normPri(get(r, iPri)) : 'should', status: normStatus(get(r, iStatus)), epic: get(r, iEpic),
+        userTypes: type === 'user' ? get(r, iUt).split(/[;|,]/).map(s => s.trim()).filter(Boolean) : [], quote: '' };
+    }).filter(Boolean);
+    if (!cands.length) return { error: 'No rows had a requirement title.' };
+    return { cands: markDups(cands) };
+  }
+
+  function renderReview() {
+    const sel = imp.cands.filter(c => c.sel);
+    const lower = s => s.toLowerCase();
+    const newEpics = [...new Set(sel.map(c => c.epic).filter(e => e && !findEpic(e)).map(lower))];
+    const newUts = [...new Set(sel.flatMap(c => c.userTypes).filter(u => !state.userTypes.some(x => lower(x.name) === lower(u))).map(lower))];
+    const groups = TYPES.map(t => ({ t, items: imp.cands.map((c, i) => [c, i]).filter(([c]) => c.type === t.k) })).filter(g => g.items.length);
+    const src = imp.via === 'ai' ? `Claude drafted <b>${imp.cands.length}</b> from ${esc(imp.label)}` : `<b>${imp.cands.length}</b> rows found in ${esc(imp.label)}`;
+    $('#impBody').innerHTML = `
+      <div class="rsum"><label><input type="checkbox" id="selAll" ${sel.length === imp.cands.length ? 'checked' : ''}> Select all</label>
+        <span>${src}</span>${newEpics.length ? `<span><b>${newEpics.length}</b> new epic${newEpics.length > 1 ? 's' : ''}</span>` : ''}${newUts.length ? `<span><b>${newUts.length}</b> new user type${newUts.length > 1 ? 's' : ''}</span>` : ''}</div>
+      ${imp.via === 'ai' ? `<p class="help" style="margin:0">Claude can misread a document. Check each draft, edit titles inline, and untick anything that isn't right. Everything is added as Draft for the team to review.</p>` : ''}
+      ${imp.truncated ? `<div class="warn">Only the first ${Math.round(MAX_DOC_CHARS / 1000)},000 characters were read. Import the rest separately if it matters.</div>` : ''}
+      ${groups.map(g => `<div class="cgroup"><h3>${typeTag(g.t.k)}<span class="gcount">${g.items.length}</span></h3><div class="cands">${g.items.map(([c, i]) => candHtml(c, i)).join('')}</div></div>`).join('')}`;
+    $('#impFoot').innerHTML = `<button class="btn ghost" type="button" data-act="imp-back">Back</button><span class="spacer"></span><button class="btn" type="button" data-close-import>Discard</button>
+      <button class="btn primary" type="button" data-act="imp-add" ${sel.length ? '' : 'disabled'}>Add ${sel.length} requirement${sel.length === 1 ? '' : 's'}</button>`;
+  }
+  function candHtml(c, i) {
+    const lower = s => s.toLowerCase();
+    const isNewEpic = c.epic && !findEpic(c.epic);
+    const uts = c.userTypes.map(u => `${esc(u)}${state.userTypes.some(x => lower(x.name) === lower(u)) ? '' : ' <span class="newtag">New</span>'}`).join(', ');
+    const more = c.description || c.quote;
+    return `<div class="cand${c.sel ? '' : ' off'}">
+      <input type="checkbox" data-cs="${i}" ${c.sel ? 'checked' : ''} aria-label="Include ${esc(c.title)}">
+      <div class="cmain">
+        <input class="ctitle" data-ci="${i}" value="${esc(c.title)}" aria-label="Requirement title">
+        <div class="cmeta">
+          <select class="select" data-ct="${i}" aria-label="Type">${TYPES.map(t => `<option value="${t.k}" ${t.k === c.type ? 'selected' : ''}>${t.label}</option>`).join('')}</select>
+          <select class="select" data-cp="${i}" aria-label="Priority">${PRI.map(p => `<option value="${p.k}" ${p.k === c.priority ? 'selected' : ''}>${p.label}</option>`).join('')}</select>
+          ${priTag(c.priority)}
+          <span>${c.epic ? `Epic: ${esc(c.epic)}${isNewEpic ? ' <span class="newtag">New</span>' : ''}` : 'No epic'}</span>
+          ${c.type === 'user' && uts ? `<span>· ${uts}</span>` : ''}
+          ${c.dup ? `<span class="duptag">Already in the list as ${esc(c.dup)}</span>` : ''}
+        </div>
+        ${more ? `<details><summary>${c.quote ? 'Detail and source' : 'Detail'}</summary>${c.description ? `<p>${esc(c.description)}</p>` : ''}${c.quote ? `<blockquote class="quote">“${esc(c.quote)}”</blockquote>` : ''}</details>` : ''}
+      </div></div>`;
+  }
+  function addCandidates() {
+    const sel = imp.cands.filter(c => c.sel && c.title.trim());
+    if (!sel.length) return;
+    const file = imp.label;
+    const added = sel.map(c => createReq({
+      type: c.type, title: c.title.trim(), description: c.description, priority: c.priority, status: c.status || 'draft',
+      epicId: epicIdFor(c.epic), userTypes: c.type === 'user' ? c.userTypes.map(utIdFor).filter(Boolean) : [],
+      source: { kind: imp.via, file, quote: c.quote || '' },
+    }, { file, via: imp.via }));
+    save();
+    const types = new Set(added.map(r => r.type));
+    ui.tab = types.size > 1 ? 'all' : [...types][0];
+    ui.pri.clear(); ui.uts.clear(); ui.search = ''; $('#search').value = '';
+    saveUi();
+    $('#importDlg').hidden = true;
+    render();
+    toast(`Added ${added.length} requirement${added.length === 1 ? '' : 's'} from ${file}`);
+  }
+
+  /* ---------- Events ---------- */
+  document.addEventListener('click', e => {
+    const t = e.target.closest('button, [data-open], label.opt');
+    if (openPopName) {
+      const [pop, btn] = POPS[openPopName];
+      if (!e.target.closest(pop) && !e.target.closest(btn)) closePops();
+    }
+    if (!t || t.matches('label.opt')) return;
+    const d = t.dataset;
+
+    if (t.id === 'toastAct') { toastAction?.(); $('#toast').hidden = true; return; }
+    if (d.tab) { ui.tab = d.tab; ui.pri.clear(); if (!canUtGroup()) ui.uts.clear(); saveUi(); render(); return; }
+    if (d.pri) { ui.pri.has(d.pri) ? ui.pri.delete(d.pri) : ui.pri.add(d.pri); render(); return; }
+    if (d.toggle) { ui.collapsed.has(d.toggle) ? ui.collapsed.delete(d.toggle) : ui.collapsed.add(d.toggle); saveUi(); renderList(); document.querySelector(`[data-toggle="${CSS.escape(d.toggle)}"]`)?.focus(); return; }
+    if (d.qafocus) { ui.collapsed.delete(d.qafocus); renderList(); document.querySelector(`[data-qa="${CSS.escape(d.qafocus)}"]`)?.focus(); return; }
+    if (d.rename) { ui.renaming = d.rename; renderList(); const i = $('#renameIn'); i?.focus(); i?.select(); return; }
+    if (d.open) { if (pane && pane.id === d.open) return; openReq(d.open); return; }
+    if (d.prop && disp) { disp.props[d.prop] = !disp.props[d.prop]; t.setAttribute('aria-pressed', disp.props[d.prop]); return; }
+    if (t.id === 'displayBtn') { openPop('display'); return; }
+    if (t.id === 'utBtn') { openPop('ut'); return; }
+    if (t.id === 'epicBtn') { openPop('epic'); return; }
+    if (t.id === 'expandBtn') {
+      const keys = $$('[data-toggle]').map(b => b.dataset.toggle);
+      const anyCollapsed = keys.some(k => ui.collapsed.has(k));
+      keys.forEach(k => anyCollapsed ? ui.collapsed.delete(k) : ui.collapsed.add(k));
+      saveUi(); renderList(); return;
+    }
+    if (t.id === 'newBtn') { openImport('doc'); return; }
+    if (t.id === 'setupBtn') { openSetup(); return; }
+    if ('closeSetup' in d) { closeSetup(); return; }
+    if ('closeImport' in d) { closeImport(); return; }
+    if (d.impmode) { imp.mode = d.impmode; imp.file = null; imp.paste = ''; imp.error = ''; renderImport(); $(`[data-impmode="${d.impmode}"]`)?.focus(); return; }
+
+    // Pane draft controls (staged until Update)
+    if (d.settype && pane) { pane.draft.type = d.settype; renderPane(); $(`#pType-${d.settype}`)?.focus(); return; }
+    if (d.setpri && pane) {
+      pane.draft.priority = d.setpri;
+      $$('[data-setpri]').forEach(b => b.setAttribute('aria-pressed', b.dataset.setpri === d.setpri));
+      renderFoot(); return;
+    }
+    if (d.ut && pane) {
+      const dr = pane.draft;
+      dr.userTypes = dr.userTypes.includes(d.ut) ? dr.userTypes.filter(x => x !== d.ut) : [...dr.userTypes, d.ut];
+      t.setAttribute('aria-pressed', dr.userTypes.includes(d.ut));
+      renderFoot(); return;
+    }
+
+    // Setup
+    if (d.epicDel) {
+      const name = epicName(d.epicDel);
+      state.reqs.forEach(r => { if (r.epicId === d.epicDel) { addLog(r, 'epicId', name, 'No epic'); r.epicId = ''; } });
+      state.epics = state.epics.filter(x => x.id !== d.epicDel);
+      if (pane && pane.draft.epicId === d.epicDel) pane.draft.epicId = '';
+      save(); renderSetup(); render(); if (pane) renderPane(); return;
+    }
+    if (d.epicUp) {
+      const i = state.epics.findIndex(x => x.id === d.epicUp);
+      if (i > 0) { [state.epics[i - 1], state.epics[i]] = [state.epics[i], state.epics[i - 1]]; save(); renderSetup(); render(); document.querySelector(`[data-epic-up="${d.epicUp}"]`)?.focus(); }
+      return;
+    }
+    if (d.utDel) {
+      state.reqs.forEach(r => { if (r.userTypes.includes(d.utDel)) setField(r, 'userTypes', r.userTypes.filter(u => u !== d.utDel)); });
+      state.userTypes = state.userTypes.filter(x => x.id !== d.utDel);
+      ui.uts.delete(d.utDel);
+      if (pane) pane.draft.userTypes = pane.draft.userTypes.filter(u => u !== d.utDel);
+      save(); renderSetup(); render(); if (pane) renderPane(); return;
+    }
+    if (d.confirm) {
+      if (d.confirm === 'wipe') { state = emptyState(); toast('Cleared'); }
+      if (d.confirm === 'restore-sample') { state = sampleState(); toast('Example project loaded'); }
+      setupConfirm = ''; ui.collapsed.clear(); ui.pri.clear(); ui.uts.clear(); ui.search = ''; $('#search').value = '';
+      if (pane) { pane = null; $('#pane').hidden = true; $('#paneScrim').hidden = true; document.body.classList.remove('pane-open'); }
+      save(); saveUi(); renderSetup(); render(); return;
+    }
+
+    const r = cur();
+    switch (d.act) {
+      case 'new': openNew(); break;
+      case 'new-epic': openPop('epic'); break;
+      case 'import': openImport(); break;
+      case 'import-doc': openImport('doc'); break;
+      case 'import-csv': openImport('csv'); break;
+      case 'manual': $('#importDlg').hidden = true; openNew(); break;
+      case 'setup': openSetup(); break;
+      case 'clear-filters': ui.pri.clear(); ui.uts.clear(); ui.search = ''; $('#search').value = ''; render(); break;
+      case 'clear-sample': guard(() => { pane = null; closePaneRaw(); state = emptyState(); save(); render(); toast('Examples cleared. Add an epic, import a document or add your first requirement.'); }); break;
+      case 'clear-sample-import': state = emptyState(); save(); if (pane) { pane = null; closePaneRaw(); } render(); renderImport(); break;
+      case 'name-dismiss': ui.nameDismissed = true; saveUi(); renderBanner(); break;
+
+      // Popovers
+      case 'pop-cancel': closePops(true); break;
+      case 'disp-reset': disp = { group: UI_DEFAULTS.group, order: UI_DEFAULTS.order, showEmpty: UI_DEFAULTS.showEmpty, showArchived: UI_DEFAULTS.showArchived, props: Object.assign({}, UI_DEFAULTS.props) }; renderDisplay(); $('[data-act="disp-apply"]')?.focus(); break;
+      case 'disp-apply': Object.assign(ui, { group: disp.group, order: disp.order, showEmpty: disp.showEmpty, showArchived: disp.showArchived, props: Object.assign({}, disp.props) }); saveUi(); closePops(true); render(); toast('Display updated'); break;
+      case 'ut-clear': utDraft.clear(); renderUtPop(); break;
+      case 'ut-apply': ui.uts = new Set(utDraft); closePops(true); render(); break;
+
+      // Epics in the list
+      case 'inline-epic': ui.addingEpic = true; renderList(); $('#inlEpic')?.focus(); break;
+      case 'inline-epic-cancel': ui.addingEpic = false; renderList(); $('[data-act="inline-epic"]')?.focus(); break;
+      case 'rename-cancel': ui.renaming = null; renderList(); break;
+
+      // Pane
+      case 'close-pane': closePane(); break;
+      case 'prev': step(-1); break;
+      case 'next': step(1); break;
+      case 'create': createFromDraft(); break;
+      case 'update': applyDraft(); break;
+      case 'discard': pane.draft = draftFrom(r); renderPane(); toast('Changes discarded'); break;
+      case 'leave-keep': pane.leaving = null; renderFoot(); $('#pTitle')?.focus(); break;
+      case 'leave-discard': { const fn = pane.leaving; pane.leaving = null; if (pane.isNew) pane.draft.title = pane.draft.description = ''; else pane.draft = draftFrom(r); fn?.(); break; }
+      case 'leave-update': { const fn = pane.leaving; if (applyDraft()) fn?.(); break; }
+      case 'archive': if (!needsClean()) setArchived(r, true); break;
+      case 'restore': if (!needsClean()) setArchived(r, false); break;
+      case 'delete-ask': pane.confirmDel = true; renderFoot(); $('[data-act="delete-no"]')?.focus(); break;
+      case 'delete-no': pane.confirmDel = false; renderFoot(); break;
+      case 'delete-yes': { const c = code(r); state.reqs = state.reqs.filter(x => x.id !== r.id); save(); pane = null; closePaneRaw(); render(); toast(`Deleted ${c}`); break; }
+      case 'so-open': if (needsClean()) break; pane.signing = true; renderPane(); $('#soBy')?.focus(); break;
+      case 'so-cancel': pane.signing = false; renderPane(); break;
+      case 'so-save': {
+        const by = $('#soBy').value.trim();
+        if (!by) { $('#soErr').hidden = false; $('#soBy').focus(); break; }
+        r.signoff = { by, date: $('#soDate').value || today(), note: $('#soNote').value.trim(), t: Date.now(), recordedBy: me() };
+        setField(r, 'status', 'approved');
+        addLog(r, 'signoff', undefined, by);
+        pane.signing = false; committedImmediate(r); toast(`Sign-off recorded on ${code(r)}`);
+        break;
+      }
+      case 'so-withdraw': {
+        if (needsClean()) break;
+        const by = r.signoff?.by; r.signoff = null;
+        addLog(r, 'signoff-withdrawn', by);
+        if (r.status === 'approved') setField(r, 'status', 'review');
+        committedImmediate(r); break;
+      }
+
+      // Data
+      case 'csv-copy': {
+        const csv = toCsv();
+        const fb = () => { const o = $('#csvOut'); o.hidden = false; o.value = csv; o.focus(); o.select(); toast('Select the text and copy it'); };
+        try { navigator.clipboard.writeText(csv).then(() => toast(`Copied ${state.reqs.length} requirements as CSV`), fb); } catch (err) { fb(); }
+        break;
+      }
+      case 'csv-download':
+        downloads?.save({ filename: slug(state.project) + '-requirements.csv', data: toCsv() })
+          .then(res => { if (res?.status === 'saved') toast('CSV saved'); })
+          .catch(err => { if (err?.code !== 'declined') toast('Download isn\'t available here. Use Copy as CSV instead.'); });
+        break;
+      case 'wipe': case 'restore-sample': setupConfirm = d.act; renderSetup(); $('[data-confirm="no"]')?.focus(); break;
+
+      // Import
+      case 'paste-open': imp.pasteOpen = true; renderImport(); $('#pasteDoc')?.focus(); break;
+      case 'imp-clear-file': imp.file = null; imp.error = ''; renderImport(); break;
+      case 'imp-go': runImport(); break;
+      case 'imp-stop': imp.ctl?.abort(); break;
+      case 'imp-back': imp.step = 'source'; imp.cands = []; renderImport(); break;
+      case 'imp-add': addCandidates(); break;
+    }
+  });
+
+  function setArchived(r, v) {
+    if (!r || r.archived === v) return;
+    r.archived = v; addLog(r, v ? 'archived' : 'restored');
+    committedImmediate(r);
+    toast(`${v ? 'Archived' : 'Restored'} ${code(r)}`, v ? 'Undo' : null, v ? () => setArchived(r, false) : null);
+  }
+
+  document.addEventListener('change', e => {
+    const el = e.target;
+    // Display and filter popovers: staged until Apply
+    if (disp && el.id === 'dGroup') { disp.group = el.value; return; }
+    if (disp && el.id === 'dOrder') { disp.order = el.value; return; }
+    if (disp && el.id === 'dEmpty') { disp.showEmpty = el.checked; return; }
+    if (disp && el.id === 'dArch') { disp.showArchived = el.checked; return; }
+    if (utDraft && el.dataset.utopt) { el.checked ? utDraft.add(el.dataset.utopt) : utDraft.delete(el.dataset.utopt); return; }
+
+    // Pane: staged until Update requirement
+    if (pane && el.id === 'pType') { pane.draft.type = el.value; renderPane(); return; }
+    if (pane && el.id === 'pStatus') { pane.draft.status = el.value; renderFoot(); return; }
+    if (pane && el.id === 'pEpic') {
+      pane.draft.epicId = el.value;
+      const ne = $('#pNewEpic'); ne.hidden = el.value !== '__new'; if (!ne.hidden) ne.focus();
+      renderFoot(); return;
+    }
+
+    // Import review
+    if (el.matches('[data-cs]')) { imp.cands[+el.dataset.cs].sel = el.checked; renderReview(); return; }
+    if (el.id === 'selAll') { imp.cands.forEach(c => c.sel = el.checked); renderReview(); return; }
+    if (el.matches('[data-ct]')) { const c = imp.cands[+el.dataset.ct]; c.type = el.value; if (c.type !== 'user') c.userTypes = []; renderReview(); return; }
+    if (el.matches('[data-cp]')) { imp.cands[+el.dataset.cp].priority = el.value; renderReview(); return; }
+
+    // Setup fields save when you leave them
+    const v = el.value.trim();
+    if (el.id === 'sProject') { state.project = v || 'Untitled project'; }
+    else if (el.id === 'sMe') { state.me = v; }
+    else if (el.dataset.epicName) { const x = state.epics.find(q => q.id === el.dataset.epicName); if (x && v && (!findEpic(v) || findEpic(v) === x)) x.name = v; else if (x) el.value = x.name; }
+    else if (el.dataset.utName) { const x = state.userTypes.find(q => q.id === el.dataset.utName); if (x && v) x.name = v; else if (x) el.value = x.name; }
+    else return;
+    save(); render(); if (pane) renderPane();
+  });
+
+  document.addEventListener('input', e => {
+    const el = e.target;
+    if (el.id === 'search') { ui.search = el.value; renderList(); return; }
+    if (pane && el.id === 'pTitle') { autosize(el); el.classList.remove('err'); $('#pTitleErr').hidden = true; pane.draft.title = el.value; renderFoot(); return; }
+    if (pane && el.id === 'pDesc') { pane.draft.description = el.value; renderFoot(); return; }
+    if (pane && el.id === 'pNewEpic') { pane.draft.newEpic = el.value; renderFoot(); return; }
+    if (el.matches?.('[data-ci]')) { imp.cands[+el.dataset.ci].title = el.value; return; }
+  });
+
+  document.addEventListener('submit', e => {
+    const f = e.target; e.preventDefault();
+    if (f.dataset.form === 'name') {
+      const v = $('#nameIn').value.trim(); if (!v) { $('#nameIn').focus(); return; }
+      state.me = v; save(); render(); if (pane) renderPane(); toast(`Thanks, ${v}. New requirements will show you as the author.`); return;
+    }
+    if (f.dataset.form === 'pop-epic') {
+      const res = addEpic($('#neName').value, $('#neDesc').value);
+      if (res.error) { const er = $('#neErr'); er.textContent = res.error; er.hidden = false; $('#neName').focus(); return; }
+      closePops(); afterEpicAdded(res.epic); return;
+    }
+    if (f.dataset.form === 'inline-epic') {
+      const res = addEpic($('#inlEpic').value);
+      if (res.error) { const er = $('#inlEpicErr'); er.textContent = res.error; er.hidden = false; $('#inlEpic').focus(); return; }
+      ui.addingEpic = false; afterEpicAdded(res.epic); return;
+    }
+    if (f.dataset.form === 'rename') {
+      const x = state.epics.find(q => q.id === f.dataset.epic), v = $('#renameIn').value.trim();
+      if (!x) return;
+      if (!v) { $('#renameIn').focus(); return; }
+      if (findEpic(v) && findEpic(v) !== x) { toast(`There's already an epic called “${findEpic(v).name}”.`); $('#renameIn').focus(); return; }
+      const key = 'e:' + x.id; x.name = v; ui.renaming = null; save(); render(); if (pane) renderPane();
+      document.querySelector(`[data-toggle="${CSS.escape(key)}"]`)?.focus(); toast('Epic renamed'); return;
+    }
+    if (f.dataset.addForm) {
+      const kind = f.dataset.addForm, inp = f.querySelector('input'), nm = inp.value.trim();
+      if (!nm) { inp.focus(); return; }
+      if (kind === 'epic') { const res = addEpic(nm); if (res.error) { toast(res.error); inp.focus(); return; } }
+      if (kind === 'ut') state.userTypes.push({ id: uid(), name: nm });
+      save(); renderSetup(); render(); if (pane) renderPane();
+      document.getElementById(kind === 'epic' ? 'newEpicName' : 'newUtName')?.focus();
+    }
+  });
+
+  document.addEventListener('keydown', e => {
+    const el = e.target;
+    const typing = /INPUT|TEXTAREA|SELECT/.test(el.tagName);
+
+    if (el.matches?.('.qa-in')) {
+      if (e.key === 'Escape') { el.value = ''; el.blur(); e.stopPropagation(); return; }
+      if (e.key === 'Enter' && el.value.trim()) {
+        e.preventDefault();
+        const key = el.dataset.qa, preset = groupInfo[key]?.preset || {};
+        const type = preset.type || (ui.tab === 'all' ? 'user' : ui.tab);
+        const made = createReq(Object.assign({ type, title: el.value.trim(), userTypes: ui.uts.size === 1 && type === 'user' ? [...ui.uts] : [] }, preset, { type }));
+        save(); renderTabs(); renderToolbar(); renderList();
+        document.querySelector(`[data-qa="${CSS.escape(key)}"]`)?.focus();
+        toast(`Added ${code(made)}`, 'Open', () => openReq(made.id));
+      }
+      return;
+    }
+    if (el.matches?.('.row[data-open]')) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (!(pane && pane.id === el.dataset.open)) openReq(el.dataset.open); return; }
+      if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) { e.preventDefault(); moveByKey(el, e.key === 'ArrowUp' ? -1 : 1); return; }
+    }
+    if (el.id === 'pTitle' && e.key === 'Enter') { e.preventDefault(); if (pane?.isNew) createFromDraft(); else if (isDirty()) applyDraft(); return; }
+    if (el.id === 'renameIn' && e.key === 'Escape') { ui.renaming = null; renderList(); return; }
+    if (el.id === 'inlEpic' && e.key === 'Escape') { ui.addingEpic = false; renderList(); return; }
+    if (el.matches?.('.ctitle') && e.key === 'Enter') { e.preventDefault(); el.blur(); return; }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && pane && $('#pane').contains(el)) { e.preventDefault(); if (pane.isNew) createFromDraft(); else if (isDirty()) applyDraft(); return; }
+
+    if (e.key === 'Escape') {
+      if (openPopName) { closePops(true); return; }
+      if (!$('#importDlg').hidden) { if (imp.step !== 'drafting') closeImport(); return; }
+      if (!$('#setup').hidden) { closeSetup(); return; }
+      if (pane) {
+        if (pane.leaving) { pane.leaving = null; renderFoot(); return; }
+        if (pane.signing) { pane.signing = false; renderPane(); return; }
+        if (pane.confirmDel) { pane.confirmDel = false; renderFoot(); return; }
+        closePane(); return;
+      }
+    }
+    if (e.key === 'Tab') {
+      const box = !$('#importDlg').hidden ? $('#importDlg .modal') : !$('#setup').hidden ? $('#setup') : null;
+      if (box) {
+        const f = $$('button, input, select, textarea, summary').filter(x => box.contains(x) && !x.disabled && x.offsetParent !== null);
+        if (f.length) {
+          const first = f[0], last = f[f.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+      }
+    }
+    if (typing || e.metaKey || e.ctrlKey || e.altKey || !$('#importDlg').hidden || !$('#setup').hidden || openPopName) return;
+    if (e.key === '/') { e.preventDefault(); $('#search').focus(); }
+    else if (pane && !pane.isNew && (e.key === 'j' || e.key === 'k')) { e.preventDefault(); step(e.key === 'j' ? 1 : -1); }
+  });
+
+  $('#paneScrim').addEventListener('click', closePane);
+  $('#scrim').addEventListener('click', closeSetup);
+  $('#importDlg').addEventListener('click', e => { if (e.target === $('#importDlg') && imp.step !== 'drafting') closeImport(); });
+
+  render();
+})();
+</script>
+
+</body></html>
